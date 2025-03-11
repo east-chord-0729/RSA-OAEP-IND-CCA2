@@ -1,0 +1,536 @@
+\documentclass{article}
+
+\title{RSA-OAEP IND-CCA2 증명}
+\author{김동현(wlswudpdlf31@kookmin.ac.kr)}
+\date{\today}
+
+\usepackage{style}
+
+% 한국어 지원 패키지
+\usepackage{kotex}
+
+% Document setting
+\usepackage{geometry}
+\geometry{
+	a4paper, 
+	left=3cm, right=3cm, top=2cm, bottom=2cm, 
+	includehead, includefoot}
+	\usepackage{fancyhdr} % 머리말과 꼬리말 설정 
+\usepackage{lastpage}
+\pagestyle{fancy}
+\fancyhf{} % 기존 머리말/꼬리말 초기화
+\renewcommand{\headrulewidth}{0.4pt} % 머리말 선 두께
+\fancyhead[L]{\leftmark} % 왼쪽 머리말
+\fancyhead[R]{\rightmark} % 오른쪽 머리말
+\renewcommand{\footrulewidth}{0.4pt}
+\fancyfoot[L]{FDL}
+\fancyfoot[R]{\thepage~/~\pageref{LastPage}} % 가운데 꼬리말에 페이지 번호 추가
+
+
+% 수학 관련 패키지
+\usepackage{amsmath, amssymb}
+\usepackage{amsthm}
+\usepackage{mathtools} % mathtools 패키지 필요
+\newtheorem{theorem}{정리}
+
+% 이미지 관련 패키지
+\usepackage{graphicx}
+
+% TikZ 패키지 추가
+\usepackage{tikz}
+
+% Table package and setting
+\usepackage{tcolorbox}
+\usepackage{tabularx}
+\usepackage{colortbl} % colortbl 패키지 추가
+\newcolumntype{C}{>{\centering\arraybackslash}X}
+
+
+\begin{document}
+
+\maketitle
+
+\section{서론}
+RSA-OAEP IND-CCA2 증명.
+
+\section{기호}
+
+\begin{itemize}
+	\item $\sp$ 보안 매개변수
+	\item $\pk$ 공개키
+	\item $\sk$ 비밀키
+	\item $(\pk, \sk) \gets \genkey(1^{\sp})$ 키 생성 알고리즘, 확률론적
+	\item $\msg$ 메시지
+	\item $\ct$ 암호문
+	\item $\ct \gets \enc(\msg, \pk)$ 암호화 함수, 확률론적
+	\item $\msg \gets \dec(\ct, \sk)$ 복호화 함수, 결정론적
+	\item $\adv$ 공격자
+	\item $\coin$ 랜덤 코인
+	\item $\msgspace$ 메시지 공간
+	\item $\coinspace$ 랜덤 코인 공간
+	\item $\bit$ 0 또는 1
+	\item $\hash, \gash$ 암호학적 해시 함수
+	\item $\mlen$ 메시지 길이
+\end{itemize}
+
+\newpage
+\section{보안 개념}
+
+\subsection{$\owcpa$}
+
+\begin{tcolorbox}[colback=white]
+	\centering
+	\begin{tabularx}{\linewidth}{CcC}
+		\underline{Challenger $\ch$} & 
+		$\xLeftrightarrow{\Exp^{\owcpa}_{\sch, \sp}}$ & 
+		\underline{Adversary $\adv$} \\
+
+		 \\
+
+		$(\pk, \sk) \gets \genkey(1^{\sp})$ & 
+		$\xrightarrow{1^{\sp}, \pk}$ & 
+	   \\
+
+		 \\
+
+		$\msg^* \rgets \msgspace$ \\
+		$\ct^* \gets \enc_{\pk}(\msg^*)$ &
+		$\xrightarrow{\ct^*}$ &
+		 \\
+
+		 \\
+
+		Return $[\msg' \same \msg^*]$ & 
+		$\xleftarrow{\msg'}$ & 
+		$\adv$ chooses $\msg' \in \msgspace$ \\
+  \end{tabularx}
+\end{tcolorbox}
+
+\begin{align}
+	\begin{split}
+		\Adv^{\owcpa}_{\adv, \sch}(\sp)
+		&= \Pr[\Exp^{\owcpa}_{\sch, \sp}(\adv) = 1] \\
+		&= \underset{\msg^*}{\Pr}[
+				(\pk, \sk) \gets \genkey(1^{\sp}): 
+				\adv(\pk, \enc_{\pk}(m^*)) = \msg^*].
+	\end{split}
+\end{align}
+
+trapdoor one-way function:
+
+\begin{tcolorbox}[colback=white]
+	\centering
+	\begin{tabularx}{\linewidth}{CcC}
+		\underline{Challenger $\ch$} & 
+		$\xLeftrightarrow{\Exp^{\owf}}$ & 
+		\underline{Adversary $\adv$} \\
+
+		 \\
+
+		$(\pk, \sk) \gets \genkey(1^{\sp})$ & 
+		$\xrightarrow{1^{\sp}, \pk}$ & 
+	   \\
+
+		 \\
+
+		$\msg^* \rgets \msgspace$ \\
+		$\ct^* \gets \enc_{\pk}(\msg^*)$ &
+		$\xrightarrow{\ct^*}$ &
+		 \\
+
+		 \\
+
+		Return $[\msg' \same \msg^*]$ & 
+		$\xleftarrow{\msg'}$ & 
+		$\adv$ chooses $\msg' \in \msgspace$ \\
+  \end{tabularx}
+\end{tcolorbox}
+
+$\sch$ is $(\rt, \negl)\textsf{-}\owcpa$ secure: \\
+Adversary $\adv$ whose running time is bounded by $\rt$,
+$\Adv^{\owcpa}_{\adv, \sch}(\sp) \le \negl$.
+
+\begin{tcolorbox}[colback=white]
+	\centering
+	\begin{tabularx}{\linewidth}{CcC}
+		\underline{Challenger $\ch$} & 
+		$\xLeftrightarrow{\Exp^{\owcpa}_{\sch, \sp}}$ & 
+		\underline{Adversary $\bdv$} \\
+
+		 \\
+
+		$(\pk, \sk) \gets \genkey(1^{\sp})$ & 
+		$\xrightarrow{1^{\sp}, \pk}$ & 
+	   \\
+
+		 \\
+
+		$(s^*, t^*) \rgets \set{0, 1}^{\sp - \sp_0} \times \set{0, 1}^{\sp_0}$ \\
+		$\ct^* \gets \enc_{\pk}(s^*, t^*)$ &
+		$\xrightarrow{\ct^*}$ &
+		 \\
+
+		 \\
+
+		Return $[s' \same s^*]$ & 
+		$\xleftarrow{s'}$ & 
+		$\adv$ chooses $s' \in \set{0, 1}^{\sp - \sp_0}$ \\
+  \end{tabularx}
+\end{tcolorbox}
+
+\begin{align}
+	\begin{split}
+		\Adv^{\owcpapd}_{\adv, \sch}(\sp)
+		&= \Pr[\Exp^{\owcpapd}_{\sch, \sp}(\adv) = 1] \\
+		&= \underset{s^*, t^*}{\Pr}[
+				(\pk, \sk) \gets \genkey(1^{\sp}): 
+				\adv(\pk, \enc_{\pk}(s^*, t^*)) = s^*].
+	\end{split}
+\end{align}
+
+
+\subsection{$\indcca$}
+
+\begin{tcolorbox}[colback=white]
+	\centering
+	\begin{tabularx}{\linewidth}{CcC}
+		\underline{Challenger $\ch$} & 
+		$\xLeftrightarrow{\Exp^{\indcca}_{\sch, \sp}}$ & 
+		\underline{Adversary $\adv$} \\
+
+		 \\
+
+		$(\pk, \sk) \gets \genkey(1^{\sp})$ & 
+		$\xrightarrow{1^{\sp}, \pk}$ & 
+	   \\
+
+		 \\
+
+		 \multicolumn{3}{c}{\cellcolor{gray!20}$\orc^{\dec_{\sk}}$ Query Phase 1} \\
+
+		 \\
+
+		 &
+		$\xleftarrow{\msg^*_0, \msg^*_1}$ & 
+		$\adv$ chooses $\msg^*_0, \msg^*_1 \in \msgspace$ such that 
+		$|\msg^*_0| = |\msg^*_1|$ and $\msg^*_0 \neq \msg^*_1$ 	
+		 \\
+
+		 \\
+
+		$\bit^* \rgets \set{0, 1}, \coin^* \rgets \coinspace$ \\
+		$\ct^* \gets \enc_{\pk}(\msg^*_{\bit^*}; \coin^*)$ &
+		$\xrightarrow{\ct^*}$ &
+		 \\
+
+		 \\
+
+		 \multicolumn{3}{c}{\cellcolor{gray!20}$\orc^{\dec_{\sk}}$ Query Phase 2} \\
+
+		 \\
+
+		Return $[\bit' \same \bit^*]$ & 
+		$\xleftarrow{\bit'}$ & 
+		$\adv$ chooses $\bit' \in \set{0, 1}$ \\
+  \end{tabularx}
+\end{tcolorbox}
+
+\begin{align}
+	\begin{split}
+		\Adv^{\indcca}_{\adv, \sch}(\sp)
+		&= 2 \cdot \Pr[\Exp^{\indcca}_{\sch, \sp}(\adv) = 1] - 1 \\
+		&= \underset{\bit^*, \coin^*}{\Pr}[
+				(\pk, \sk) \gets \genkey(1^{\sp});
+				(\msg^*_0, \msg^*_1) \gets \adv: 
+				\adv(\pk, \enc_{\pk}(\msg^*_{\bit^*}; \coin^*)) = \bit^*].
+	\end{split}
+\end{align}
+
+$\sch$ is $(\rt, \negl)\textsf{-}\indcca$ secure: \\
+Adversary $\adv$ whose running time is bounded by $\rt$,
+$\Adv^{\owcpa}_{\adv, \sch}(\sp) \le \negl$.
+
+\subsection{Random Oracle Model}
+
+\begin{tcolorbox}[colback=white]
+	\centering
+	\begin{tabularx}{\linewidth}{CcC}
+		\underline{Challenger $\ch$} & 
+		 & 
+		\underline{Adversary $\adv$} \\
+
+		 \\
+
+		 $\orcl_{\hash} \gets \set$ &&\\
+
+		 \\
+
+		& $\xleftarrow{x}$ & $\adv$ chooses $x \in \set{0, 1}^*$ \\
+
+		\\
+
+		If $(x, y') \in \orcl$ then $y \gets y'$ \\
+		else $y \rgets \set{0, 1}^{\mlen}$ \\
+		$\orcl_{\hash} \gets \orcl_{\hash} \cap (x, y)$ &
+		$\xrightarrow{y}$ & \\
+
+  \end{tabularx}
+\end{tcolorbox}
+
+\begin{tcolorbox}[colback=white]
+	\centering
+	\begin{tabularx}{\linewidth}{CcC}
+		\underline{Challenger $\ch$} & 
+		$\xLeftrightarrow{\Exp^{\indccarom}_{\sch, \sp}}$ & 
+		\underline{Adversary $\adv$} \\
+
+		 \\
+
+		$\orcl_{\hash} \gets \set$ \\
+		$(\pk, \sk) \gets \genkey(1^{\sp})$ & 
+		$\xrightarrow{1^{\sp}, \pk}$ & 
+	   \\
+
+		 \\
+
+		 \multicolumn{3}{c}{\cellcolor{gray!20}$\orc^{\hash}, \orc^{\dec_{\sk}}$ Query Phase 1} \\
+
+		 \\
+
+		 &
+		$\xleftarrow{\msg^*_0, \msg^*_1}$ & 
+		$\adv$ chooses $\msg^*_0, \msg^*_1 \in \msgspace$ such that 
+		$|\msg^*_0| = |\msg^*_1|$ and $\msg^*_0 \neq \msg^*_1$ 	
+		 \\
+
+		 \\
+
+		$\bit^* \rgets \set{0, 1}, \coin^* \rgets \coinspace$ \\
+		$\ct^* \gets \enc_{\pk}(\msg^*_{\bit^*}; \coin^*)$ &
+		$\xrightarrow{\ct^*}$ &
+		 \\
+
+		 \\
+
+		 \multicolumn{3}{c}{\cellcolor{gray!20}$\orc^{\hash}, \orc^{\dec_{\sk}}$ Query Phase 2} \\
+
+		 \\
+
+		Return $[\bit' \same \bit^*]$ & 
+		$\xleftarrow{\bit'}$ & 
+		$\adv$ chooses $\bit' \in \set{0, 1}$ \\
+  \end{tabularx}
+\end{tcolorbox}
+
+\newpage
+\section{RSA-OAEP}
+
+
+치환(permutation) $f: \set{0, 1}^{\sp} \To \set{0, 1}^{\sp}$를 다음과 같이
+표현한다.
+$$
+  f: \set{0, 1}^{\mlen + \sp_1} \times \set{0, 1}^{\sp_0}
+   \To \set{0, 1}^{\mlen + \sp_1} \times \set{0, 1}^{\sp_0}.
+$$
+이 때, $\sp = \mlen + \sp_0 + \sp_1$이다.
+
+함수 $f$와 그 역함수 $g$로부터 얻은 OAEP 암호 $(\genkey, \enc, \dec)$를 나타내기
+위해, 다음과 같은 두 해시 함수 $\hash, \gash$가 필요하다.
+$$
+	\hash: \set{0, 1}^{\sp_0} \to \set{0, 1}^{\sp - \sp_0} \quad
+	\gash: \set{0, 1}^{\sp - \sp_0} \to \set{0, 1}^{\sp_0}.
+$$
+OAEP 암호 $(\genkey, \enc, \dec)$는 다음과 같다.
+\begin{itemize}
+	\item $\genkey(1^{\sp})$: 함수 $f$의 인스턴스 $\pk$, 함수 $g$의 인스턴스
+	$\sk$를 생성한다.
+	\item $\enc_{\pk}(\msg, \coin)$: $\msg \in \set{0, 1}^{\mlen}$과 $\coin \rgets
+	\set{0, 1}^{\sp_0}$가 주어졌을 때, 다음을 계산한다.
+	$$
+		s = (\msg \parallel 0^{\sp_1}) \xor \gash(\coin) \quad
+		t = \coin \xor \hash(s).
+	$$
+	이후 암호문 $\ct = f(s, t)$를 출력한다.
+  \item $\dec_{\sk}(\ct)$: $\sk$를 사용하여 다음을 순서대로 계산할 수 있다.
+  \begin{itemize}
+    \item $(s,t) = g(\ct)$
+    \item $r = t \xor \hash(s), M = s \xor \gash(\coin)$
+  \end{itemize}
+  만약 $[M]_{\sp_1} = 0^{\sp_1}$이면 $[M]_{\mlen}$을 출력하고, 아니라면
+  “$\textsf{Reject}$”를 출력한다. 이 표현에서, $[M]_{k_1}$은 $M$의 하위 $\sp_1$
+  비트를, $[M]_{\mlen}$은 $M$의 상위 $\mlen$ 비트를 의미한다.
+\end{itemize}
+
+\begin{center}
+	\begin{tikzpicture}
+		% message box
+		\node[draw, rectangle, minimum width=3cm, minimum height=0.6cm] (box) at (1,
+		1) {$\msg$}; 
+		\draw[<->] ([yshift=0.5cm] box.west) -- ([yshift=0.5cm]
+		box.east) node[midway, above] {$n = \sp - \sp_0 - \sp_1$};
+		% \draw[<->] ([xshift=-0.5cm] box.north) -- ([xshift=-0.5cm] box.south) node[midway, left] {$h$};
+		
+		% zero box
+		\node[draw, rectangle, minimum width=2cm, minimum height=0.6cm] (box2) at (-1.5,
+		1) {$0^{\sp_0}$};
+
+		% seed box
+		\node[draw, rectangle, minimum width=2cm, minimum height=0.6cm] (box3) at (-3.5,
+		1) {$\coin$};
+
+		% t box
+		\node[draw, rectangle, minimum width=2cm, minimum height=0.6cm] (box4) at (-3.5,
+		-3.5) {$t$};
+
+		% s box
+		\node[draw, rectangle, minimum width=5cm, minimum height=0.6cm] (box5) at (0,
+		-3.5) {$s$};
+
+		% hash1 box
+		\node[draw, rectangle, minimum width=1cm, minimum height=1cm] (hbox1) at (-1.25,
+		-0.5) {$\hash$};
+
+		% hash2 box
+		\node[draw, rectangle, minimum width=1cm, minimum height=1cm] (hbox1) at (-1.25,
+		-2) {$\gash$};
+
+		% r -> t
+		\draw[->] (box3) -- (box4);
+
+	\end{tikzpicture}
+\end{center}
+
+\section{OAEP IND-CCA2 증명}
+
+\begin{theorem}
+	$\adv$를 OAEP 변환 $(\genkey, \enc, \dec)$에 대해 능력치(advantage)
+	$\negl$과 시간(running time) $\rt$를 가지고, 복호화 오라클, 해시 함수
+	$\hash$ 및 $\gash$에 각각 $\qr_{\dec}, \qr_{\hash}, \qr_{\gash}$ 회
+	질의하는 $\textsf{IND-CCA2}$ 공격자라 하자. 다음을 만족한다.
+	$$
+    S \ge \frac{1}{\qr_{\hash}} \left(
+      \frac{\negl}{2}
+       - \frac{2\qr_{\dec}\qr_{\gash} + \qr_{\dec} + \qr_{\gash}}{2^{\sp_0}}
+       - \frac{2\qr_{\dec}}{2^{\sp_1}}
+    \right).
+	$$
+  이 때, $\rt' \le t \cdot \qr_{\hash} \cdot \qr_{\gash} \cdot (\comp{f} +
+   \bigo(1))$이고, $\comp{f}$는 함수 $f$의 시간 복잡도를 의미한다.
+\end{theorem}
+
+
+
+우리는 보조정리 2를 세 단계로 증명한다. 첫 번째 단계에서는 $\indcca$ 적대자
+$\adv$를 부분 도메인 일방성(partial-domain one-wayness) $f$를 깨뜨리는 알고리즘
+$\bdv$로 환원하는 과정을 제시한다. 현재의 증명에서는 원본 논문 [3]에서와 같은
+전체 도메인 일방성(full-domain one-wayness)이 아니라, 부분 도메인 일방성
+하에서의 보안성에만 관심을 둔다. 두 번째 단계에서는 이 환원에서 사용된 복호화
+오라클 시뮬레이션이 부분 도메인 일방성 하에서 압도적인 확률로 올바르게 동작함을
+보인다. 이 부분은 원본 증명 [3]과 다르며, 최근 발견된 오류 [15]를 수정한다.
+마지막으로, 우리는 복호화 오라클 시뮬레이션에 대한 위에서 언급한 분석을 포함하여
+전체적인 환원의 성공 확률을 분석한다.
+
+이 첫 번째 부분에서는 환원이 어떻게 작동하는지를 다시 살펴본다. $\adv$를
+$(\genkey, \enc, \dec)$의 $\indcca$ 공격자로 가정하자. 시간 제한 $\rt$ 내에서,
+$\adv$는 복호화 오라클에 대해 $\qr_{\dec}$개의 질의를 하고, 무작위 오라클 $\hash,
+\gash$에 대해 각각 $\qr_{\hash}, \qr_{\gash}$개의 질의를 수행하며, 특정 확률
+$\negl$보다 높은 능력치로 올바른 평문을 구별해낸다. 이제 환원 $\bdv$을 설명한다.
+
+\begin{tcolorbox}[colback=white]
+	\centering
+	\begin{tabularx}{\linewidth}{CcCcC}
+		\underline{Challenger $\ch$} & 
+		$\xLeftrightarrow{\Exp^{\owcpa}_{\sch, \sp}}$ & 
+		\underline{Adversary $\bdv$} &
+		$\xLeftrightarrow{\Exp^{\indcca}_{\sch, \sp}}$ &
+		\underline{Adversary $\adv$} \\
+
+		 \\
+
+		$(\pk, \sk) \gets \genkey(1^{\sp})$ & 
+		$\xrightarrow{1^{\sp}, \pk}$ & 
+	   \\
+
+		 \\
+
+		$\msg^* = (s^*, t^*) \rgets \set{0, 1}^{\sp - \sp_0} \times \set{0, 1}^{\sp_0}$ \\
+		$\ct^* \gets \enc_{\pk}(\msg^*)$ &
+		$\xrightarrow{\ct^*}$ &
+		 \\
+
+		 \\
+
+		 & & \multicolumn{3}{c}{\cellcolor{gray!20}$\orc^{\dec_{\sk}}, \orc^{\hash}, \orc^{\gash}$ Query Phase 1} \\
+
+		 \\
+
+		& & & 
+		$\xleftarrow{\msg^*_0, \msg^*_1}$ & 
+		$\adv$ chooses $\msg^*_0, \msg^*_1 \in \msgspace$ such that 
+		$|\msg^*_0| = |\msg^*_1|$ and $\msg^*_0 \neq \msg^*_1$ \\
+
+		 \\
+
+		 & & $\bit \rgets \set{0, 1}$ & $\xrightarrow{\ct^*}$ & \\
+
+		 \\
+
+		 & & \multicolumn{3}{c}{\cellcolor{gray!20}$\orc^{\dec_{\sk}}, \orc^{\hash}, \orc^{\gash}$ Query Phase 2} \\
+
+		 \\
+
+		 \\
+
+		Return $[s' \same s^*]$ & 
+		$\xleftarrow{s'}$ & 
+		$\bdv$ chooses $s' \in \set{0, 1}^{\sp - \sp_0}$ &
+		$\xleftarrow{\bit'}$ &
+		$\adv$ chooses $\bit' \in \set{0, 1}$ \\
+  \end{tabularx}
+\end{tcolorbox}
+
+이 실험에서 세 개의 오라클을 $\bdv$가 처리하기 때문에, 다음을 고려해야한다.
+\begin{itemize}
+	\item 공격자 $\adv$의 질의에 대해서, 오라클은 유효한 응답을 해야 한다. $\adv$가
+	오라클이 잘못된 응답을 하고 있다는 것을 감지해서는 안된다.
+	\item 오라클이 기대하는 확률분포와 일관되어야 한다. 일관되지 않으면 $\adv$가
+	이상을 감지할 수 있다.
+	\item 오라클 응답은 일관되어야 한다.
+	\item 복호화 오라클은 $\bdv$가 비밀키를 모름에도 수행할 수 있어야 한다.
+\end{itemize}
+
+\textbf{How $\bdv$ simulate $\orc^{\gash}$?}
+
+\begin{itemize}
+	\item If $\gamma \in \orcl_{\gash}$, then response $\gash_{\gamma}$
+	and $\orcl_{\gash} \gets \orcl_{\gash} \cap (\gamma, \gash_{\gamma})$.
+	\item Otherwise, do following:
+	\begin{itemize}
+		\item For some $\delta \in \orcl_{\hash}$, if $c^* = f(\delta, \gamma \xor
+		\hash_{\delta})$, then $\gash_{\gamma} \gets \delta \xor (\msg_{\bit} \parallel
+		0^{\sp_1})$.
+		\item For all $\delta \in \orcl_{\hash}$, if $c^* \neq f(\delta, \gamma \xor
+		\hash_{\delta})$, then $\gash_{\gamma} \rgets \set{0 ,1}^{\sp}$.
+		\item response $\gash_{\gamma}$ and $\orcl_{\gash} \gets \orcl_{\gash} \cap
+		(\gamma, \gash_{\gamma})$.
+	\end{itemize}
+\end{itemize}
+
+\textbf{How $\bdv$ simulate $\orc^{\hash}$?}
+
+\begin{itemize}
+	\item If $\delta \in \orcl_{\hash}$, then response $\hash_\delta$.
+	\item Otherwise, response $\hash_{\delta} \rgets \set{0 ,1}^{\sp}$ and
+	$\orcl_{\hash} \gets \orcl_{\hash} \cap (\delta, \hash_{\delta})$.
+\end{itemize}
+
+\textbf{How $\bdv$ simulate $\orc^{\dec_{\sk}}$?} 
+
+\begin{itemize}
+	\item If $\ct = f(\delta, \hash_{\delta} \xor \gamma)$ and 
+	$[\gash_{\gamma} \xor \delta]_{\sp_1} = 0^{\sp_1}$, then
+	response $[\gash_{\gamma} \xor \delta]^n$.
+	\item Otherwise, response $\reject$.
+\end{itemize}
+
+\end{document}
