@@ -36,6 +36,8 @@
 % 이미지 관련 패키지
 \usepackage{graphicx}
 
+\usepackage{hyperref}
+
 % TikZ 패키지 추가
 \usepackage{tikz}
 
@@ -47,28 +49,47 @@
 
 
 \begin{document}
-
 \maketitle
+\tableofcontents
 
-\section{기호}
+\newpage
+\section{논문정보}
 
 \begin{itemize}
-	\item $\sp$ 보안 매개변수
-	\item $\pk$ 공개키
-	\item $\sk$ 비밀키
-	\item $(\pk, \sk) \gets \genkey(1^{\sp})$ 키 생성 알고리즘, 확률론적
-	\item $\msg$ 메시지
-	\item $\ct$ 암호문
-	\item $\ct \gets \enc(\msg, \pk)$ 암호화 함수, 확률론적
-	\item $\msg \gets \dec(\ct, \sk)$ 복호화 함수, 결정론적
-	\item $\adv$ 공격자
-	\item $\coin$ 랜덤 코인
-	\item $\msgspace$ 메시지 공간
-	\item $\coinspace$ 랜덤 코인 공간
-	\item $\bit$ 0 또는 1
-	\item $\hash, \gash$ 암호학적 해시 함수
-	\item $\mlen$ 메시지 길이
+	\item 제목: RSA-OAEP is Secure under the RSA Assumption
+	\item 저자: Eiichiro Fujisaki1, Tatsuaki Okamoto, David Pointcheval, and Jacques Stern
+	\item 년도: 2001년
+	\item 초록: 최근 Victor Shoup은 적응적 선택 암호문 공격에 대한 OAEP의 보안성에 관한 널리
+	받아들여진 결과에 틈이 있음을 지적하였다. 더욱이, 그는 기본 트랩도어 치환의
+	단방향성만으로는 OAEP의 보안성을 증명할 수 없을 것으로 예상된다는 점을 보였다.
+	본 논문은 OAEP의 보안성에 대한 또 다른 결과를 제시한다. 즉, 본 논문에서는 무작위
+	오라클 모델에서, 기본 치환의 부분 영역 단방향성(partial-domain one-wayness)
+	하에서, OAEP가 적응적 선택 암호문 공격에 대해 의미론적 보안성을 제공함을
+	증명한다. 따라서, 이는 형식적으로 더 강한 가정을 사용한다. 그럼에도 불구하고,
+	RSA 함수의 부분 영역 단방향성이 (전체 영역) 단방향성과 동치이므로, RSA-OAEP의
+	보안성은 단순한 RSA 가정만으로도 증명될 수 있음을 알 수 있다. 다만, 그
+	축소(reduction)는 타이트하지 않다.
 \end{itemize}
+
+% \section{기호}
+
+% \begin{itemize}
+% 	\item $\sp$ 보안 매개변수
+% 	\item $\pk$ 공개키
+% 	\item $\sk$ 비밀키
+% 	\item $(\pk, \sk) \gets \genkey(1^{\sp})$ 키 생성 알고리즘, 확률론적
+% 	\item $\msg$ 메시지
+% 	\item $\ct$ 암호문
+% 	\item $\ct \gets \enc(\msg, \pk)$ 암호화 함수, 확률론적
+% 	\item $\msg \gets \dec(\ct, \sk)$ 복호화 함수, 결정론적
+% 	\item $\adv$ 공격자
+% 	\item $\coin$ 랜덤 코인
+% 	\item $\msgspace$ 메시지 공간
+% 	\item $\coinspace$ 랜덤 코인 공간
+% 	\item $\bit$ 0 또는 1
+% 	\item $\hash, \gash$ 암호학적 해시 함수
+% 	\item $\mlen$ 메시지 길이
+% \end{itemize}
 
 \newpage
 \section{보안 개념}
@@ -333,79 +354,59 @@ $f: \set{0, 1}^{\sp - \sp_0} \times \set{0, 1}^{\sp_0} \to \set{0, 1}^{\sp -
 \section{RSA-OAEP}
 
 
-치환(permutation) $f: \set{0, 1}^{\sp} \To \set{0, 1}^{\sp}$를 다음과 같이
-표현한다.
+치환(Permutation) $f: \set{0, 1}^{\sp} \to \set{0, 1}^{\sp}$를 다음과 같이 표현한다.
 $$
   f: \set{0, 1}^{\mlen + \sp_1} \times \set{0, 1}^{\sp_0}
-   \To \set{0, 1}^{\mlen + \sp_1} \times \set{0, 1}^{\sp_0}.
+   \to \set{0, 1}^{\mlen + \sp_1} \times \set{0, 1}^{\sp_0}
 $$
-이 때, $\sp = \mlen + \sp_0 + \sp_1$이다.
-
-함수 $f$와 그 역함수 $g$로부터 얻은 OAEP 암호 $(\genkey, \enc, \dec)$를 나타내기
-위해, 다음과 같은 두 해시 함수 $\hash, \gash$가 필요하다.
+이때, $\sp = \mlen + \sp_0 + \sp_1$이다. 그리고 다음과 같은 두 해시 함수 $H, G$를 준비한다.
 $$
 	\hash: \set{0, 1}^{\sp_0} \to \set{0, 1}^{\sp - \sp_0} \quad
 	\gash: \set{0, 1}^{\sp - \sp_0} \to \set{0, 1}^{\sp_0}.
 $$
-OAEP 암호 $(\genkey, \enc, \dec)$는 다음과 같다.
+OAEP 암호체계(Cryptosystem) $(\genkey, \enc, \dec)$는 다음과 같이 동작한다.
 \begin{itemize}
 	\item $\genkey(1^{\sp})$: 함수 $f$의 인스턴스 $\pk$, 함수 $g$의 인스턴스
-	$\sk$를 생성한다.
-	\item $\enc_{\pk}(\msg, \coin)$: $\msg \in \set{0, 1}^{\mlen}$과 $\coin \rgets
-	\set{0, 1}^{\sp_0}$가 주어졌을 때, 다음을 계산한다.
+	$\sk$를 출력한다.
+	\item $\enc_{\pk}(\msg, \coin)$: $\msg \in \set{0, 1}^{\mlen}$과 $\coin
+	\rgets \set{0, 1}^{\sp_0}$가 주어졌을 때, $s, t$를 다음과 같이 계산한다.
 	$$
-		s = (\msg \parallel 0^{\sp_1}) \xor \gash(\coin) \quad
+		s = (\msg \parallel 0^{\sp_1}) \xor \gash(\coin), \quad
 		t = \coin \xor \hash(s).
 	$$
-	이후 암호문 $\ct = f(s, t)$를 출력한다.
-  \item $\dec_{\sk}(\ct)$: $\sk$를 사용하여 다음을 순서대로 계산할 수 있다.
-  \begin{itemize}
-    \item $(s,t) = g(\ct)$
-    \item $r = t \xor \hash(s), M = s \xor \gash(\coin)$
-  \end{itemize}
-  만약 $[M]_{\sp_1} = 0^{\sp_1}$이면 $[M]_{\mlen}$을 출력하고, 아니라면
-  “$\textsf{Reject}$”를 출력한다. 이 표현에서, $[M]_{k_1}$은 $M$의 하위 $\sp_1$
-  비트를, $[M]_{\mlen}$은 $M$의 상위 $\mlen$ 비트를 의미한다.
+	$s, t$를 계산하는 과정을 도식화하면 그림 \ref{fig:oaep}와 같다. 이후 암호문
+	$\ct = f(s, t)$를 출력한다. 같다.
+  	\item $\dec_{\sk}(\ct)$: $(s,t) = g_{\sk}(\ct)$을 계산한 후, $r, M$을 다음과
+  	같이 계산한다.
+	$$
+    	r = t \xor \hash(s)ㅡ \quad M = s \xor \gash(\coin).
+	$$
+  	만약 $[M]_{\sp_1} = 0^{\sp_1}$이면 $[M]^{\mlen}$을 출력하고, 아니라면
+  	“$\textsf{Reject}$”를 출력한다.
 \end{itemize}
 
-\begin{center}
+\begin{figure}[ht]
+	\centering
 	\begin{tikzpicture}
-		% message box
-		\node[draw, rectangle, minimum width=3cm, minimum height=0.6cm] (box) at (1,
-		1) {$\msg$}; 
-		\draw[<->] ([yshift=0.5cm] box.west) -- ([yshift=0.5cm]
-		box.east) node[midway, above] {$n = \sp - \sp_0 - \sp_1$};
-		% \draw[<->] ([xshift=-0.5cm] box.north) -- ([xshift=-0.5cm] box.south) node[midway, left] {$h$};
-		
-		% zero box
-		\node[draw, rectangle, minimum width=2cm, minimum height=0.6cm] (box2) at (-1.5,
-		1) {$0^{\sp_0}$};
+		\node (m0) at (0, 0) {$\msg \parallel 0^{\sp_0}$};
+		\node (r) at (3, 0) {$\coin$};
+		\node (g) at (1.5, -1) {$\gash$};
+		\node (h) at (1.5, -2) {$\hash$};
+		\node (s) at (0, -3) {$s$};
+		\node (t) at (3, -3) {$t$};
+		\node (xorh) at (0, -1) {$\xor$};
+		\node (xorg) at (3, -2) {$\xor$};
 
-		% seed box
-		\node[draw, rectangle, minimum width=2cm, minimum height=0.6cm] (box3) at (-3.5,
-		1) {$\coin$};
-
-		% t box
-		\node[draw, rectangle, minimum width=2cm, minimum height=0.6cm] (box4) at (-3.5,
-		-3.5) {$t$};
-
-		% s box
-		\node[draw, rectangle, minimum width=5cm, minimum height=0.6cm] (box5) at (0,
-		-3.5) {$s$};
-
-		% hash1 box
-		\node[draw, rectangle, minimum width=1cm, minimum height=1cm] (hbox1) at (-1.25,
-		-0.5) {$\hash$};
-
-		% hash2 box
-		\node[draw, rectangle, minimum width=1cm, minimum height=1cm] (hbox1) at (-1.25,
-		-2) {$\gash$};
-
-		% r -> t
-		\draw[->] (box3) -- (box4);
-
+		\draw[->] (r) |- (g);
+		\draw[->] (r) -- (t);
+		\draw[->] (m0) -- (s);
+		\draw[->] (m0) |- (h);
+		\draw[->] (g) -| (s);
+		\draw[->] (h) -| (t);
 	\end{tikzpicture}
-\end{center}
+	\caption{$\enc_{\pk}(\msg, \coin)$에서 $s, t$를 계산하는 과정}
+	\label{fig:oaep}
+\end{figure}
 
 \section{OAEP IND-CCA2 증명}
 
