@@ -50,9 +50,6 @@
 
 \maketitle
 
-\section{서론}
-RSA-OAEP IND-CCA2 증명.
-
 \section{기호}
 
 \begin{itemize}
@@ -106,35 +103,37 @@ RSA-OAEP IND-CCA2 증명.
   \end{tabularx}
 \end{tcolorbox}
 
-\begin{align}
-	\begin{split}
-		\Adv^{\owcpa}_{\adv, \sch}(\sp)
-		&= \Pr[\Exp^{\owcpa}_{\sch, \sp}(\adv) = 1] \\
-		&= \underset{\msg^*}{\Pr}[
-				(\pk, \sk) \gets \genkey(1^{\sp}): 
-				\adv(\pk, \enc_{\pk}(m^*)) = \msg^*].
-	\end{split}
-\end{align}
+% \begin{align}
+% 	\begin{split}
+% 		\Adv^{\owcpa}_{\adv, \sch}(\sp)
+% 		&= \Pr[\Exp^{\owcpa}_{\sch, \sp}(\adv) = 1] \\
+% 		&= \underset{\msg^*}{\Pr}[
+% 				(\pk, \sk) \gets \genkey(1^{\sp}): 
+% 				\adv(\pk, \enc_{\pk}(m^*)) = \msg^*].
+% 	\end{split}
+% \end{align}
 
-trapdoor one-way function:
+\subsection{\owf}
+
+$f:\set{0, 1}^{\sp} \to \set{0, 1}^{\sp}$ is a trapdoor one-way permutation.
 
 \begin{tcolorbox}[colback=white]
 	\centering
 	\begin{tabularx}{\linewidth}{CcC}
 		\underline{Challenger $\ch$} & 
-		$\xLeftrightarrow{\Exp^{\owf}}$ & 
+		$\xLeftrightarrow{\Exp^{\owf}_{f, \sp}}$ & 
 		\underline{Adversary $\adv$} \\
 
 		 \\
 
-		$(\pk, \sk) \gets \genkey(1^{\sp})$ & 
-		$\xrightarrow{1^{\sp}, \pk}$ & 
-	   \\
+		& 
+		$\xrightarrow{f}$ & 
+	     \\
 
 		 \\
 
 		$\msg^* \rgets \msgspace$ \\
-		$\ct^* \gets \enc_{\pk}(\msg^*)$ &
+		$\ct^* \gets f(\msg^*)$ &
 		$\xrightarrow{\ct^*}$ &
 		 \\
 
@@ -146,27 +145,32 @@ trapdoor one-way function:
   \end{tabularx}
 \end{tcolorbox}
 
-$\sch$ is $(\rt, \negl)\textsf{-}\owcpa$ secure: \\
-Adversary $\adv$ whose running time is bounded by $\rt$,
-$\Adv^{\owcpa}_{\adv, \sch}(\sp) \le \negl$.
+% $\sch$ is $(\rt, \negl)\textsf{-}\owcpa$ secure: \\
+% Adversary $\adv$ whose running time is bounded by $\rt$,
+% $\Adv^{\owcpa}_{\adv, \sch}(\sp) \le \negl$.
+
+\subsection{\owfpd}
+
+$f: \set{0, 1}^{\sp - \sp_0} \times \set{0, 1}^{\sp_0} \to \set{0, 1}^{\sp -
+\sp_0} \times \set{0, 1}^{\sp_0}$ is a trapdoor one-way permutation.
 
 \begin{tcolorbox}[colback=white]
 	\centering
 	\begin{tabularx}{\linewidth}{CcC}
 		\underline{Challenger $\ch$} & 
-		$\xLeftrightarrow{\Exp^{\owcpa}_{\sch, \sp}}$ & 
+		$\xLeftrightarrow{\Exp^{\owfpd}_{f, \sp}}$ & 
 		\underline{Adversary $\bdv$} \\
 
 		 \\
 
-		$(\pk, \sk) \gets \genkey(1^{\sp})$ & 
-		$\xrightarrow{1^{\sp}, \pk}$ & 
+		 & 
+		$\xrightarrow{f}$ & 
 	   \\
 
 		 \\
 
 		$(s^*, t^*) \rgets \set{0, 1}^{\sp - \sp_0} \times \set{0, 1}^{\sp_0}$ \\
-		$\ct^* \gets \enc_{\pk}(s^*, t^*)$ &
+		$\ct^* \gets f(s^*, t^*)$ &
 		$\xrightarrow{\ct^*}$ &
 		 \\
 
@@ -178,16 +182,19 @@ $\Adv^{\owcpa}_{\adv, \sch}(\sp) \le \negl$.
   \end{tabularx}
 \end{tcolorbox}
 
-\begin{align}
-	\begin{split}
-		\Adv^{\owcpapd}_{\adv, \sch}(\sp)
-		&= \Pr[\Exp^{\owcpapd}_{\sch, \sp}(\adv) = 1] \\
-		&= \underset{s^*, t^*}{\Pr}[
-				(\pk, \sk) \gets \genkey(1^{\sp}): 
-				\adv(\pk, \enc_{\pk}(s^*, t^*)) = s^*].
-	\end{split}
-\end{align}
+% \begin{align}
+% 	\begin{split}
+% 		\Adv^{\owcpapd}_{\adv, \sch}(\sp)
+% 		&= \Pr[\Exp^{\owcpapd}_{f, \sp}(\adv) = 1] \\
+% 		&= \underset{s^*, t^*}{\Pr}[
+% 				(\pk, \sk) \gets \genkey(1^{\sp}): 
+% 				\adv(\pk, \enc_{\pk}(s^*, t^*)) = s^*].
+% 	\end{split}
+% \end{align}
 
+\subsection{$\owfpds$}
+
+??
 
 \subsection{$\indcca$}
 
@@ -218,8 +225,8 @@ $\Adv^{\owcpa}_{\adv, \sch}(\sp) \le \negl$.
 
 		 \\
 
-		$\bit^* \rgets \set{0, 1}, \coin^* \rgets \coinspace$ \\
-		$\ct^* \gets \enc_{\pk}(\msg^*_{\bit^*}; \coin^*)$ &
+		$\bit \rgets \set{0, 1}$ \\
+		$\ct^* \gets \enc_{\pk}(\msg^*_{\bit})$ &
 		$\xrightarrow{\ct^*}$ &
 		 \\
 
@@ -229,53 +236,53 @@ $\Adv^{\owcpa}_{\adv, \sch}(\sp) \le \negl$.
 
 		 \\
 
-		Return $[\bit' \same \bit^*]$ & 
+		Return $[\bit' \same \bit]$ & 
 		$\xleftarrow{\bit'}$ & 
 		$\adv$ chooses $\bit' \in \set{0, 1}$ \\
   \end{tabularx}
 \end{tcolorbox}
 
-\begin{align}
-	\begin{split}
-		\Adv^{\indcca}_{\adv, \sch}(\sp)
-		&= 2 \cdot \Pr[\Exp^{\indcca}_{\sch, \sp}(\adv) = 1] - 1 \\
-		&= \underset{\bit^*, \coin^*}{\Pr}[
-				(\pk, \sk) \gets \genkey(1^{\sp});
-				(\msg^*_0, \msg^*_1) \gets \adv: 
-				\adv(\pk, \enc_{\pk}(\msg^*_{\bit^*}; \coin^*)) = \bit^*].
-	\end{split}
-\end{align}
+% \begin{align}
+% 	\begin{split}
+% 		\Adv^{\indcca}_{\adv, \sch}(\sp)
+% 		&= 2 \cdot \Pr[\Exp^{\indcca}_{\sch, \sp}(\adv) = 1] - 1 \\
+% 		&= \underset{\bit^*, \coin^*}{\Pr}[
+% 				(\pk, \sk) \gets \genkey(1^{\sp});
+% 				(\msg^*_0, \msg^*_1) \gets \adv: 
+% 				\adv(\pk, \enc_{\pk}(\msg^*_{\bit^*}; \coin^*)) = \bit^*].
+% 	\end{split}
+% \end{align}
 
-$\sch$ is $(\rt, \negl)\textsf{-}\indcca$ secure: \\
-Adversary $\adv$ whose running time is bounded by $\rt$,
-$\Adv^{\owcpa}_{\adv, \sch}(\sp) \le \negl$.
+% $\sch$ is $(\rt, \negl)\textsf{-}\indcca$ secure: \\
+% Adversary $\adv$ whose running time is bounded by $\rt$,
+% $\Adv^{\owcpa}_{\adv, \sch}(\sp) \le \negl$.
 
-\subsection{Random Oracle Model}
+\subsection{$\indccarom$}
 
-\begin{tcolorbox}[colback=white]
-	\centering
-	\begin{tabularx}{\linewidth}{CcC}
-		\underline{Challenger $\ch$} & 
-		 & 
-		\underline{Adversary $\adv$} \\
+% \begin{tcolorbox}[colback=white]
+% 	\centering
+% 	\begin{tabularx}{\linewidth}{CcC}
+% 		\underline{Challenger $\ch$} & 
+% 		 & 
+% 		\underline{Adversary $\adv$} \\
 
-		 \\
+% 		 \\
 
-		 $\orcl_{\hash} \gets \set$ &&\\
+% 		 $\orcl_{\hash} \gets \set$ &&\\
 
-		 \\
+% 		 \\
 
-		& $\xleftarrow{x}$ & $\adv$ chooses $x \in \set{0, 1}^*$ \\
+% 		& $\xleftarrow{x}$ & $\adv$ chooses $x \in \set{0, 1}^*$ \\
 
-		\\
+% 		\\
 
-		If $(x, y') \in \orcl$ then $y \gets y'$ \\
-		else $y \rgets \set{0, 1}^{\mlen}$ \\
-		$\orcl_{\hash} \gets \orcl_{\hash} \cap (x, y)$ &
-		$\xrightarrow{y}$ & \\
+% 		If $(x, y') \in \orcl$ then $y \gets y'$ \\
+% 		else $y \rgets \set{0, 1}^{\mlen}$ \\
+% 		$\orcl_{\hash} \gets \orcl_{\hash} \cap (x, y)$ &
+% 		$\xrightarrow{y}$ & \\
 
-  \end{tabularx}
-\end{tcolorbox}
+%   \end{tabularx}
+% \end{tcolorbox}
 
 \begin{tcolorbox}[colback=white]
 	\centering
@@ -305,8 +312,8 @@ $\Adv^{\owcpa}_{\adv, \sch}(\sp) \le \negl$.
 
 		 \\
 
-		$\bit^* \rgets \set{0, 1}, \coin^* \rgets \coinspace$ \\
-		$\ct^* \gets \enc_{\pk}(\msg^*_{\bit^*}; \coin^*)$ &
+		$\bit \rgets \set{0, 1}$ \\
+		$\ct^* \gets \enc_{\pk}(\msg^*_{\bit})$ &
 		$\xrightarrow{\ct^*}$ &
 		 \\
 
@@ -316,7 +323,7 @@ $\Adv^{\owcpa}_{\adv, \sch}(\sp) \le \negl$.
 
 		 \\
 
-		Return $[\bit' \same \bit^*]$ & 
+		Return $[\bit' \same \bit]$ & 
 		$\xleftarrow{\bit'}$ & 
 		$\adv$ chooses $\bit' \in \set{0, 1}$ \\
   \end{tabularx}
@@ -440,23 +447,27 @@ $\negl$보다 높은 능력치로 올바른 평문을 구별해낸다. 이제 �
 	\centering
 	\begin{tabularx}{\linewidth}{CcCcC}
 		\underline{Challenger $\ch$} & 
-		$\xLeftrightarrow{\Exp^{\owcpa}_{\sch, \sp}}$ & 
+		$\xLeftrightarrow{\Exp^{\owfpd}_{f, \sp}}$ & 
 		\underline{Adversary $\bdv$} &
-		$\xLeftrightarrow{\Exp^{\indcca}_{\sch, \sp}}$ &
+		$\xLeftrightarrow{\Exp^{\indccarom}_{\sch, \sp}}$ &
 		\underline{Adversary $\adv$} \\
 
 		 \\
 
-		$(\pk, \sk) \gets \genkey(1^{\sp})$ & 
-		$\xrightarrow{1^{\sp}, \pk}$ & 
-	   \\
+		 & 
+		$\xrightarrow{f}$ &  &  &
+	     \\
 
 		 \\
 
-		$\msg^* = (s^*, t^*) \rgets \set{0, 1}^{\sp - \sp_0} \times \set{0, 1}^{\sp_0}$ \\
-		$\ct^* \gets \enc_{\pk}(\msg^*)$ &
-		$\xrightarrow{\ct^*}$ &
+		$(s^*, t^*) \rgets \set{0, 1}^{\sp - \sp_0} \times \set{0, 1}^{\sp_0}$ \\
+		$\ct^* \gets f(s^*, t^*)$ &
+		$\xrightarrow{\ct^*}$ & & &
 		 \\
+
+		 \\
+
+		 & & $\orcl_{\hash}, \orcl_{\gash} \gets \set{}, \set{}$ & $\xrightarrow{1^{\sp}, \pk}$ & \\
 
 		 \\
 
@@ -471,7 +482,7 @@ $\negl$보다 높은 능력치로 올바른 평문을 구별해낸다. 이제 �
 
 		 \\
 
-		 & & $\bit \rgets \set{0, 1}$ & $\xrightarrow{\ct^*}$ & \\
+		 & & & $\xrightarrow{\ct^*}$ & \\
 
 		 \\
 
@@ -489,15 +500,15 @@ $\negl$보다 높은 능력치로 올바른 평문을 구별해낸다. 이제 �
   \end{tabularx}
 \end{tcolorbox}
 
-이 실험에서 세 개의 오라클을 $\bdv$가 처리하기 때문에, 다음을 고려해야한다.
-\begin{itemize}
-	\item 공격자 $\adv$의 질의에 대해서, 오라클은 유효한 응답을 해야 한다. $\adv$가
-	오라클이 잘못된 응답을 하고 있다는 것을 감지해서는 안된다.
-	\item 오라클이 기대하는 확률분포와 일관되어야 한다. 일관되지 않으면 $\adv$가
-	이상을 감지할 수 있다.
-	\item 오라클 응답은 일관되어야 한다.
-	\item 복호화 오라클은 $\bdv$가 비밀키를 모름에도 수행할 수 있어야 한다.
-\end{itemize}
+% 이 실험에서 세 개의 오라클을 $\bdv$가 처리하기 때문에, 다음을 고려해야한다.
+% \begin{itemize}
+% 	\item 공격자 $\adv$의 질의에 대해서, 오라클은 유효한 응답을 해야 한다. $\adv$가
+% 	오라클이 잘못된 응답을 하고 있다는 것을 감지해서는 안된다.
+% 	\item 오라클이 기대하는 확률분포와 일관되어야 한다. 일관되지 않으면 $\adv$가
+% 	이상을 감지할 수 있다.
+% 	\item 오라클 응답은 일관되어야 한다.
+% 	\item 복호화 오라클은 $\bdv$가 비밀키를 모름에도 수행할 수 있어야 한다.
+% \end{itemize}
 
 \textbf{How $\bdv$ simulate $\orc^{\gash}$?}
 
