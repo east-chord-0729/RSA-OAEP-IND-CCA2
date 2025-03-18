@@ -32,6 +32,9 @@
 \usepackage{amsthm}
 \usepackage{mathtools} % mathtools 패키지 필요
 \newtheorem{theorem}{정리}
+\newtheorem{lemma}{보조정리}
+\theoremstyle{definition}
+\newtheorem{memo}{메모}
 
 % 이미지 관련 패키지
 \usepackage{graphicx}
@@ -94,35 +97,20 @@
 \newpage
 \section{보안 개념}
 
-\subsection{$\owcpa$}
+% \subsection{$\owcpa$}
 
-\begin{tcolorbox}[colback=white]
-	\centering
-	\begin{tabularx}{\linewidth}{CcC}
-		\underline{Challenger $\ch$} & 
-		$\xLeftrightarrow{\Exp^{\owcpa}_{\sch, \sp}}$ & 
-		\underline{Adversary $\adv$} \\
-
-		 \\
-
-		$(\pk, \sk) \gets \genkey(1^{\sp})$ & 
-		$\xrightarrow{1^{\sp}, \pk}$ & 
-	   \\
-
-		 \\
-
-		$\msg^* \rgets \msgspace$ \\
-		$\ct^* \gets \enc_{\pk}(\msg^*)$ &
-		$\xrightarrow{\ct^*}$ &
-		 \\
-
-		 \\
-
-		Return $[\msg' \same \msg^*]$ & 
-		$\xleftarrow{\msg'}$ & 
-		$\adv$ chooses $\msg' \in \msgspace$ \\
-  \end{tabularx}
-\end{tcolorbox}
+% \begin{tcolorbox}[colback=white]
+% 	\centering
+% 	\begin{tabularx}{\linewidth}{CcC}
+% 		\underline{Challenger $\ch$} & $\xLeftrightarrow{\Exp^{\owcpa}_{\sch, \sp}}$ & \underline{Adversary $\adv$} \\
+% 		\\
+% 		$(\pk, \sk) \gets \genkey(1^{\sp})$ & $\xrightarrow{1^{\sp}, \pk}$ & \\
+% 		\\
+% 		$\msg^* \rgets \msgspace$ \\ $\ct^* \gets \enc_{\pk}(\msg^*)$ & $\xrightarrow{\ct^*}$ & \\
+% 		\\
+% 		Return $[\msg' \same \msg^*]$ & $\xleftarrow{\msg'}$ & $\adv$ chooses $\msg' \in \msgspace$ \\
+%   \end{tabularx}
+% \end{tcolorbox}
 
 % \begin{align}
 % 	\begin{split}
@@ -134,252 +122,216 @@
 % 	\end{split}
 % \end{align}
 
-\subsection{\owf}
+\subsection{OW trapdoor permutation}
+트랩도어 치환 체계(Trapdoor permutation scheme) $\tdsch = (\genkey, \td, \itd)$를 다음과
+같이 정의한다.
+\begin{itemize}
+	\item $\genkey(1^{\sp})$: 확률론적 키 생성 알고리즘으로, $1^{\sp}$를 입력
+	받아 $(\pk, \sk)$를 생성한다.
+	\item $\td_{\pk}(x)$: 결정론적 알고리즘으로, $\pk$와 $x \in \set{0, 1}^{\sp}$를 입력 받아
+	$y \in \set{0 ,1}^{\sp}$를 출력한다.
+	\item $\itd_{\sk}(y)$: 결정론적 알고리즘으로, $\sk$와 $y \in \set{0,
+	1}^{\sp}$를 입력 받아 $x \in \set{0, 1}^{\sp}$를 출력한다.
+	$\genkey(1^{\sp})$로 생성한 모든 $(\pk, \sk)$와 모든 $x \in \set{0,
+	1}^{\sp}$에 대해, $\itd_{\sk}(\td_{\pk}(x)) = x$를 만족한다.
+\end{itemize}
+동작시간(Running time) $\rt$를 가지는 공격자 $\adv$와 트랩도어 치환 체계
+$\tdsch$에 대한 일방향성(One-wayness) 실험 $\Exp^{\ow}_{\tdsch, \sp}(\adv; \rt)$을
+다음과 같이 정의한다.
+\begin{tcolorbox}[colback=white]
+	\centering
+	\begin{tabularx}{\linewidth}{CcC}
+		\underline{Challenger $\ch$} & $\xLeftrightarrow{\Exp^{\ow}_{\tdsch, \sp}}$ & \underline{Adversary $\adv$} \\
+		\\
+		$(\pk, \sk) \rgets \genkey(1^{\sp})$ & & \\
+		\\
+		$x^* \rgets \set{0, 1}^{\sp}$ \\ $y^* \gets \td_{\pk}(x^*)$ & $\xrightarrow{1^{\sp}, \pk, y^*}$ & \\
+		\\ 
+		Return $[x' \same x^*]$ & $\xleftarrow{x'}$ & $\adv$ chooses $x' \in \xspace$ \\
+  \end{tabularx}
+\end{tcolorbox}
 
-$f:\set{0, 1}^{\sp} \to \set{0, 1}^{\sp}$ is a trapdoor one-way permutation.
+$\adv$의 능력치 $\Adv^{\ow}_{\adv,
+\tdsch}(\sp, \rt)$를 다음과 같이 정의한다.
+$$
+	\Adv^{\ow}_{\adv, \tdsch}(\sp, \rt) := \Pr[\Exp^{\ow}_{\tdsch, \sp}(\adv; \rt) = 1].
+$$
+공격자 $\adv$의 능력치가 어떤 $\negl$에 대해 다음을 만족할 때, $\tdsch$가 $(\rt,
+\negl)$-일방향성을 가진다고 한다.
+$$
+	\Adv^{\ow}_{\adv, \tdsch}(\sp, \rt) \le \negl.
+$$
+
+\subsection{Partial-domain OW trapdoor permutation}
+
+트랩도어 치환 $\tdsch = (\genkey, \td, \itd)$에서, $\td_{\pk}(x):\set{0, 1}^{\sp} \to
+\set{0, 1}^{\sp}$를 다음과 같이 표현한다.
+$$
+	\td_{\pk}: \set{0, 1}^{\mlen + \sp_1} \times \set{0, 1}^{\sp_0} \to \set{0, 1}^{\mlen + \sp_1} \times \set{0, 1}^{\sp_0}.
+$$
+이때 $\sp = \mlen + \sp_0 + \sp_1$이다. 
+\begin{memo}
+	예를 들어, $x = s \parallel t$라고 할 때, $y \gets \td_{\pk}(x)$ 대신 $y
+	\gets \td_{\pk}(s \parallel t)$로 표현할 수 있다.
+\end{memo}
+동작시간 $\rt$를 가지는 공격자 $\adv$와 트랩도어 함수 체계 $\tdsch$에 대한 부분
+일방향성(Partial-domain one-wayness) 실험 $\Exp^{\owpd}_{\tdsch, \sp}(\adv;
+\rt)$을 다음과 같이 정의한다.
 
 \begin{tcolorbox}[colback=white]
 	\centering
 	\begin{tabularx}{\linewidth}{CcC}
-		\underline{Challenger $\ch$} & 
-		$\xLeftrightarrow{\Exp^{\owf}_{f, \sp}}$ & 
-		\underline{Adversary $\adv$} \\
-
-		 \\
-
-		& 
-		$\xrightarrow{f}$ & 
-	     \\
-
-		 \\
-
-		$\msg^* \rgets \msgspace$ \\
-		$\ct^* \gets f(\msg^*)$ &
-		$\xrightarrow{\ct^*}$ &
-		 \\
-
-		 \\
-
-		Return $[\msg' \same \msg^*]$ & 
-		$\xleftarrow{\msg'}$ & 
-		$\adv$ chooses $\msg' \in \msgspace$ \\
+		\underline{Challenger $\ch$} & $\xLeftrightarrow{\Exp^{\owpd}_{\tdsch, \sp}}$ & \underline{Adversary $\adv$} \\
+		\\
+		$(\pk, \sk) \rgets \genkey(1^{\sp})$ & & \\
+		\\
+		$(s^*, t^*) \rgets \set{0, 1}^{\mlen + \sp_1} \times \set{0, 1}^{\sp_0}$ \\ $y^* \gets \td_{\pk}(s^*, t^*)$ & $\xrightarrow{1^{\sp}, \pk, y^*}$ & \\
+		\\
+		Return $[s' \same s^*]$ & $\xleftarrow{s'}$ & $\adv$ chooses $s' \in \set{0, 1}^{\mlen + \sp_1}$ \\
   \end{tabularx}
 \end{tcolorbox}
 
-% $\sch$ is $(\rt, \negl)\textsf{-}\owcpa$ secure: \\
-% Adversary $\adv$ whose running time is bounded by $\rt$,
-% $\Adv^{\owcpa}_{\adv, \sch}(\sp) \le \negl$.
+공격자 $\adv$의 능력치 $\Adv^{\owpd}_{\adv, \tdsch}(\sp, \rt)$를 다음과 같이 정의한다.
+$$
+	\Adv^{\owpd}_{\adv, \tdsch}(\sp, \rt) := \Pr[\Exp^{\owpd}_{\tdsch, \sp}(\adv; \rtimes) = 1].
+$$
+동작시간 $\rt$를 가지는 공격자 $\adv$의 능력치가 어떤 $\negl$에 대해 다음을
+만족할 때, $\tdsch$가 $(\rt, \negl)$-부분 일방향성을 가진다고 한다.
+$$
+	\Adv^{\owpd}_{\adv, \tdsch}(\sp, \rt) \le \negl.
+$$
 
-\subsection{\owfpd}
+\subsection{Set partial-domain OW trapdoor permutation}
 
-$f: \set{0, 1}^{\sp - \sp_0} \times \set{0, 1}^{\sp_0} \to \set{0, 1}^{\sp -
-\sp_0} \times \set{0, 1}^{\sp_0}$ is a trapdoor one-way permutation.
+동작시간 $\rt$를 가지고 $l$개의 원소를 출력하는 공격자 $\adv$와 트랩도어 함수
+체계 $\tdsch$에 대한 집합 부분 일방향성(Set partial-domain one-wayness) 실험
+$\Exp^{\owpds}_{\tdsch, \sp}(\adv; \rt, l)$을 다음과 같이 정의한다.
+\begin{tcolorbox}[colback=white]
+	\centering
+	\begin{tabularx}{\linewidth}{CcC}
+		\underline{Challenger $\ch$} & $\xLeftrightarrow{\Exp^{\owpds}_{\tdsch, \sp}}$ & \underline{Adversary $\adv$} \\
+		\\
+		$(\pk, \sk) \rgets \genkey(1^{\sp})$ & & \\
+		\\
+		$(s^*, t^*) \rgets \set{0, 1}^{\mlen + \sp_1} \times \set{0, 1}^{\sp_0}$ \\ $y^* \gets \td_{\pk}(s^*, t^*)$ & $\xrightarrow{1^{\sp}, \pk, y^*}$ & \\
+		\\
+		Return $[s'_i \same s^*]$ & $\xleftarrow{s'_0, s'_1, \cdots, s'_{l-1}}$ & $\adv$ chooses $s'_0, s'_1, \cdots, s'_{l-1} \in \set{0, 1}^{\mlen + \sp_1}$ \\
+  \end{tabularx}
+\end{tcolorbox}
+
+공격자 $\adv$의 능력치 $\Adv^{\owpds}_{\adv, \tdsch}(\sp, \rt, l)$를 다음과 같이 정의한다.
+$$
+	\Adv^{\owpds}_{\adv, \tdsch}(\sp, \rt, l) := \Pr[\Exp^{\owpds}_{\tdsch, \sp}(\adv; \rt, l) = 1].
+$$
+동작시간 $\rt$를 가지는 공격자 $\adv$의 능력치가 어떤 $\negl$에 대해 다음을
+만족할 때, $\tdsch$가 $(l, \rt, \negl)$-집합 부분 일방향성을 가진다고 한다.
+$$
+	\Adv^{\owpds}_{\adv, \tdsch}(\sp, \rt, l) \le \negl.
+$$
+
+\subsection{IND security against CCA2}
+
+공개키 암호
+체계(Public-key encryption scheme) $\sch = (\genkey, \enc, \dec)$를 다음과 같이
+정의한다.
+\begin{itemize}
+	\item $\genkey(1^{\sp})$: 확률론적 키 생성 알고리즘으로, $1^{\sp}$를 입력
+	받아 $(\pk, \sk)$를 생성한다.
+	\item $\enc_{\pk}(\msg)$: 암호화 알고리즘으로, $\pk$와 $\msg \in
+	\msgspace$를 입력 받아 $\ct \in \ctspace$를 출력한다. 확률론적 알고리즘으로,
+	$\coin \rgets \coinspace$를 추가로 입력 받아 $\enc_{\pk}(\msg; \coin)$으로
+	표현할 수도 있다.
+	\item $\dec_{\sk}(\ct)$: 결정론적 복호화 알고리즘으로, $\sk$와 $\ct \in
+	\ctspace$를 입력 받아 $\msg \in \msgspace$를 출력한다.
+\end{itemize}
+
+선택 암호문 공격(Adaptive chosen ciphertext attack, 이하 CCA2)을 수행하고 복호화
+오라클에 $\qr$회 질의하는 공격자 $\adv$와 공개키 암호 체계 $\sch$에 대해,
+의미론적(Semantic, 혹은 indistinguishability, 이하 IND) 안전성 실험
+$\Exp^{\indcca}_{\sch, \sp}(\adv; \qr)$을 다음과 같이 정의한다.
 
 \begin{tcolorbox}[colback=white]
 	\centering
 	\begin{tabularx}{\linewidth}{CcC}
-		\underline{Challenger $\ch$} & 
-		$\xLeftrightarrow{\Exp^{\owfpd}_{f, \sp}}$ & 
-		\underline{Adversary $\bdv$} \\
-
-		 \\
-
-		 & 
-		$\xrightarrow{f}$ & 
-	   \\
-
-		 \\
-
-		$(s^*, t^*) \rgets \set{0, 1}^{\sp - \sp_0} \times \set{0, 1}^{\sp_0}$ \\
-		$\ct^* \gets f(s^*, t^*)$ &
-		$\xrightarrow{\ct^*}$ &
-		 \\
-
-		 \\
-
-		Return $[s' \same s^*]$ & 
-		$\xleftarrow{s'}$ & 
-		$\adv$ chooses $s' \in \set{0, 1}^{\sp - \sp_0}$ \\
+		\underline{Challenger $\ch$} & $\xLeftrightarrow{\Exp^{\indcca}_{\sch, \sp}}$ & \underline{Adversary $\adv$} \\
+		\\
+		$(\pk, \sk) \gets \genkey(1^{\sp})$ & $\xrightarrow{1^{\sp}, \pk}$ & \\
+		\\
+		\multicolumn{3}{c}{\cellcolor{gray!20}$\orc^{\dec_{\sk}}$ Query Phase 1} \\
+		\\ 
+		& $\xleftarrow{\msg^*_0, \msg^*_1}$ & $\adv$ chooses $\msg^*_0, \msg^*_1 \in \msgspace$ such that $|\msg^*_0| = |\msg^*_1|$ and $\msg^*_0 \neq \msg^*_1$ \\
+		\\
+		$\bit \rgets \set{0, 1}, \coin \rgets \coinspace$ \\ $\ct^* \gets \enc_{\pk}(\msg^*_{\bit}; \coin)$ & $\xrightarrow{\ct^*}$ & \\
+		\\
+		\multicolumn{3}{c}{\cellcolor{gray!20}$\orc^{\dec_{\sk}}$ Query Phase 2} \\
+		\\
+		Return $[\bit' \same \bit]$ & $\xleftarrow{\bit'}$ & $\adv$ chooses $\bit' \in \set{0, 1}$ \\
   \end{tabularx}
 \end{tcolorbox}
 
-% \begin{align}
-% 	\begin{split}
-% 		\Adv^{\owcpapd}_{\adv, \sch}(\sp)
-% 		&= \Pr[\Exp^{\owcpapd}_{f, \sp}(\adv) = 1] \\
-% 		&= \underset{s^*, t^*}{\Pr}[
-% 				(\pk, \sk) \gets \genkey(1^{\sp}): 
-% 				\adv(\pk, \enc_{\pk}(s^*, t^*)) = s^*].
-% 	\end{split}
-% \end{align}
+공격자 $\adv$의 능력치 $\Adv^{\indcca}_{\adv, \sch}(\sp, \qr)$를 다음과 같이 정의한다.
+$$
+	\Adv^{\indcca}_{\adv, \sch}(\sp, \qr) = 2 \cdot \Pr[\Exp^{\indcca}_{\sch, \sp}(\adv; \qr) = 1] - 1.
+$$
 
-\subsection{$\owfpds$}
+\subsection{IND security against CCA2 in ROM}
 
-??
-
-\subsection{$\indcca$}
+복호화 오라클에 $\qr_{\dec}$회, 랜덤 오라클에 $\qr_{\hash}$회 질의하는 CCA2
+공격자 $\adv$와 공개키 암호 체계 $\sch$에 대해, 랜덤 오라클 모델(Random oracle
+model)에서의 IND 실험 $\Exp^{\indccarom}_{\sch, \sp}(\adv; \qr_{\dec},
+\qr_{\hash})$을 다음과 같이 정의한다.
 
 \begin{tcolorbox}[colback=white]
 	\centering
 	\begin{tabularx}{\linewidth}{CcC}
-		\underline{Challenger $\ch$} & 
-		$\xLeftrightarrow{\Exp^{\indcca}_{\sch, \sp}}$ & 
-		\underline{Adversary $\adv$} \\
-
-		 \\
-
-		$(\pk, \sk) \gets \genkey(1^{\sp})$ & 
-		$\xrightarrow{1^{\sp}, \pk}$ & 
-	   \\
-
-		 \\
-
-		 \multicolumn{3}{c}{\cellcolor{gray!20}$\orc^{\dec_{\sk}}$ Query Phase 1} \\
-
-		 \\
-
-		 &
-		$\xleftarrow{\msg^*_0, \msg^*_1}$ & 
-		$\adv$ chooses $\msg^*_0, \msg^*_1 \in \msgspace$ such that 
-		$|\msg^*_0| = |\msg^*_1|$ and $\msg^*_0 \neq \msg^*_1$ 	
-		 \\
-
-		 \\
-
-		$\bit \rgets \set{0, 1}$ \\
-		$\ct^* \gets \enc_{\pk}(\msg^*_{\bit})$ &
-		$\xrightarrow{\ct^*}$ &
-		 \\
-
-		 \\
-
-		 \multicolumn{3}{c}{\cellcolor{gray!20}$\orc^{\dec_{\sk}}$ Query Phase 2} \\
-
-		 \\
-
-		Return $[\bit' \same \bit]$ & 
-		$\xleftarrow{\bit'}$ & 
-		$\adv$ chooses $\bit' \in \set{0, 1}$ \\
+		\underline{Challenger $\ch$} & $\xLeftrightarrow{\Exp^{\indccarom}_{\sch, \sp}}$ & \underline{Adversary $\adv$} \\
+		\\
+		$\orc_{\hash} \rgets \hashspace$ \\ $(\pk, \sk) \gets \genkey(1^{\sp})$ & $\xrightarrow{1^{\sp}, \pk}$ & \\
+		\\
+		\multicolumn{3}{c}{\cellcolor{gray!20}$\orc^{\hash}, \orc^{\dec_{\sk}}$ Query Phase 1} \\
+		\\
+		& $\xleftarrow{\msg^*_0, \msg^*_1}$ & $\adv$ chooses $\msg^*_0, \msg^*_1 \in \msgspace$ such that $|\msg^*_0| = |\msg^*_1|$ and $\msg^*_0 \neq \msg^*_1$ \\
+		\\
+		$\bit \rgets \set{0, 1}, \coin \rgets \coinspace$ \\ $\ct^* \gets \enc_{\pk}(\msg^*_{\bit}; \coin)$ & $\xrightarrow{\ct^*}$ & \\
+		\\
+		\multicolumn{3}{c}{\cellcolor{gray!20}$\orc^{\hash}, \orc^{\dec_{\sk}}$ Query Phase 2} \\
+		\\
+		Return $[\bit' \same \bit]$ & $\xleftarrow{\bit'}$ & $\adv$ chooses $\bit' \in \set{0, 1}$ \\
   \end{tabularx}
 \end{tcolorbox}
 
-% \begin{align}
-% 	\begin{split}
-% 		\Adv^{\indcca}_{\adv, \sch}(\sp)
-% 		&= 2 \cdot \Pr[\Exp^{\indcca}_{\sch, \sp}(\adv) = 1] - 1 \\
-% 		&= \underset{\bit^*, \coin^*}{\Pr}[
-% 				(\pk, \sk) \gets \genkey(1^{\sp});
-% 				(\msg^*_0, \msg^*_1) \gets \adv: 
-% 				\adv(\pk, \enc_{\pk}(\msg^*_{\bit^*}; \coin^*)) = \bit^*].
-% 	\end{split}
-% \end{align}
-
-% $\sch$ is $(\rt, \negl)\textsf{-}\indcca$ secure: \\
-% Adversary $\adv$ whose running time is bounded by $\rt$,
-% $\Adv^{\owcpa}_{\adv, \sch}(\sp) \le \negl$.
-
-\subsection{$\indccarom$}
-
-% \begin{tcolorbox}[colback=white]
-% 	\centering
-% 	\begin{tabularx}{\linewidth}{CcC}
-% 		\underline{Challenger $\ch$} & 
-% 		 & 
-% 		\underline{Adversary $\adv$} \\
-
-% 		 \\
-
-% 		 $\orcl_{\hash} \gets \set$ &&\\
-
-% 		 \\
-
-% 		& $\xleftarrow{x}$ & $\adv$ chooses $x \in \set{0, 1}^*$ \\
-
-% 		\\
-
-% 		If $(x, y') \in \orcl$ then $y \gets y'$ \\
-% 		else $y \rgets \set{0, 1}^{\mlen}$ \\
-% 		$\orcl_{\hash} \gets \orcl_{\hash} \cap (x, y)$ &
-% 		$\xrightarrow{y}$ & \\
-
-%   \end{tabularx}
-% \end{tcolorbox}
-
-\begin{tcolorbox}[colback=white]
-	\centering
-	\begin{tabularx}{\linewidth}{CcC}
-		\underline{Challenger $\ch$} & 
-		$\xLeftrightarrow{\Exp^{\indccarom}_{\sch, \sp}}$ & 
-		\underline{Adversary $\adv$} \\
-
-		 \\
-
-		$\orcl_{\hash} \gets \set$ \\
-		$(\pk, \sk) \gets \genkey(1^{\sp})$ & 
-		$\xrightarrow{1^{\sp}, \pk}$ & 
-	   \\
-
-		 \\
-
-		 \multicolumn{3}{c}{\cellcolor{gray!20}$\orc^{\hash}, \orc^{\dec_{\sk}}$ Query Phase 1} \\
-
-		 \\
-
-		 &
-		$\xleftarrow{\msg^*_0, \msg^*_1}$ & 
-		$\adv$ chooses $\msg^*_0, \msg^*_1 \in \msgspace$ such that 
-		$|\msg^*_0| = |\msg^*_1|$ and $\msg^*_0 \neq \msg^*_1$ 	
-		 \\
-
-		 \\
-
-		$\bit \rgets \set{0, 1}$ \\
-		$\ct^* \gets \enc_{\pk}(\msg^*_{\bit})$ &
-		$\xrightarrow{\ct^*}$ &
-		 \\
-
-		 \\
-
-		 \multicolumn{3}{c}{\cellcolor{gray!20}$\orc^{\hash}, \orc^{\dec_{\sk}}$ Query Phase 2} \\
-
-		 \\
-
-		Return $[\bit' \same \bit]$ & 
-		$\xleftarrow{\bit'}$ & 
-		$\adv$ chooses $\bit' \in \set{0, 1}$ \\
-  \end{tabularx}
-\end{tcolorbox}
+공격자 $\adv$의 능력치 $\Adv^{\indccarom}_{\adv, \sch}(\sp, \qr_{\dec},
+\qr_{\hash})$를 다음과 같이 정의한다.
+$$
+	\Adv^{\indccarom}_{\adv, \sch}(\sp, \qr_{\dec},
+	\qr_{\hash}) = 2 \cdot \Pr[\Exp^{\indccarom}_{\sch, \sp}(\adv; \qr_{\dec},
+	\qr_{\hash}) = 1] - 1.
+$$
 
 \newpage
 \section{RSA-OAEP}
-
-
-치환(Permutation) $f: \set{0, 1}^{\sp} \to \set{0, 1}^{\sp}$를 다음과 같이 표현한다.
-$$
-  f: \set{0, 1}^{\mlen + \sp_1} \times \set{0, 1}^{\sp_0}
-   \to \set{0, 1}^{\mlen + \sp_1} \times \set{0, 1}^{\sp_0}
-$$
-이때, $\sp = \mlen + \sp_0 + \sp_1$이다. 그리고 다음과 같은 두 해시 함수 $H, G$를 준비한다.
+다음과 같은 두 해시 함수 $H, G$를 준비한다.
 $$
 	\hash: \set{0, 1}^{\sp_0} \to \set{0, 1}^{\sp - \sp_0} \quad
 	\gash: \set{0, 1}^{\sp - \sp_0} \to \set{0, 1}^{\sp_0}.
 $$
-OAEP 암호체계(Cryptosystem) $(\genkey, \enc, \dec)$는 다음과 같이 동작한다.
+트랩토어 치환 체계 $\tdsch = (\genkey, \td, \itd)$를 포함하는 OAEP 변환
+$(\genkey, \enc, \dec)$는 다음과 같이 동작한다.
 \begin{itemize}
-	\item $\genkey(1^{\sp})$: 함수 $f$의 인스턴스 $\pk$, 함수 $g$의 인스턴스
-	$\sk$를 출력한다.
-	\item $\enc_{\pk}(\msg, \coin)$: $\msg \in \set{0, 1}^{\mlen}$과 $\coin
+	\item $\genkey(1^{\sp})$: $(\pk, \sk)$를 생성한다. $\pk$는 이후 트랩도어 치환
+	$\td$에서 사용하며, $\sk$는 $\itd$에서 사용한다.
+	\item $\enc_{\pk}(\msg; \coin)$: $\msg \in \set{0, 1}^{\mlen}$과 $\coin
 	\rgets \set{0, 1}^{\sp_0}$가 주어졌을 때, $s, t$를 다음과 같이 계산한다.
 	$$
 		s = (\msg \parallel 0^{\sp_1}) \xor \gash(\coin), \quad
 		t = \coin \xor \hash(s).
 	$$
 	$s, t$를 계산하는 과정을 도식화하면 그림 \ref{fig:oaep}와 같다. 이후 암호문
-	$\ct = f(s, t)$를 출력한다. 같다.
-  	\item $\dec_{\sk}(\ct)$: $(s,t) = g_{\sk}(\ct)$을 계산한 후, $r, M$을 다음과
+	$\ct = \td_{\pk}(s, t)$를 출력한다.
+  	\item $\dec_{\sk}(\ct)$: $(s,t) = \itd_{\sk}(\ct)$을 계산한 후, $r, M$을 다음과
   	같이 계산한다.
 	$$
-    	r = t \xor \hash(s)ㅡ \quad M = s \xor \gash(\coin).
+    	r = t \xor \hash(s) \quad M = s \xor \gash(\coin).
 	$$
   	만약 $[M]_{\sp_1} = 0^{\sp_1}$이면 $[M]^{\mlen}$을 출력하고, 아니라면
   	“$\textsf{Reject}$”를 출력한다.
@@ -404,45 +356,63 @@ OAEP 암호체계(Cryptosystem) $(\genkey, \enc, \dec)$는 다음과 같이 동�
 		\draw[->] (g) -| (s);
 		\draw[->] (h) -| (t);
 	\end{tikzpicture}
-	\caption{$\enc_{\pk}(\msg, \coin)$에서 $s, t$를 계산하는 과정}
+	\caption{$\enc_{\pk}(\msg; \coin)$에서 $s, t$를 계산하는 과정}
 	\label{fig:oaep}
 \end{figure}
 
-\section{OAEP IND-CCA2 증명}
+\section{증명}
 
-\begin{theorem}
-	$\adv$를 OAEP 변환 $(\genkey, \enc, \dec)$에 대해 능력치(advantage)
-	$\negl$과 시간(running time) $\rt$를 가지고, 복호화 오라클, 해시 함수
-	$\hash$ 및 $\gash$에 각각 $\qr_{\dec}, \qr_{\hash}, \qr_{\gash}$ 회
-	질의하는 $\textsf{IND-CCA2}$ 공격자라 하자. 다음을 만족한다.
-	$$
-    S \ge \frac{1}{\qr_{\hash}} \left(
-      \frac{\negl}{2}
-       - \frac{2\qr_{\dec}\qr_{\gash} + \qr_{\dec} + \qr_{\gash}}{2^{\sp_0}}
-       - \frac{2\qr_{\dec}}{2^{\sp_1}}
-    \right).
-	$$
-  이 때, $\rt' \le t \cdot \qr_{\hash} \cdot \qr_{\gash} \cdot (\comp{f} +
-   \bigo(1))$이고, $\comp{f}$는 함수 $f$의 시간 복잡도를 의미한다.
-\end{theorem}
+\begin{tcolorbox}[colback=white]
+	\begin{lemma}
+		공격자 $\adv$를 OAEP 변환 $(\genkey, \enc, \dec)$에 대해 $\rt$를 가지고,
+		복호화 오라클 $\orc^{\dec}$와 랜덤 오라클 $\orc^{\hash}, \orc^{\gash}$에
+		각각 $\qr_{\dec}, \qr_{\hash}, \qr_{\gash}$회 질의하는
+		$\textsf{IND-CCA2}$ 공격자라 하자. 어떤 $\owpds$ 공격자 $\bdv$에 대해,
+		다음을 만족한다.
+		$$
+			\Adv^{\owpds}_{\bdv, \tdsch}(\sp, \rt', \qr_{\hash})
+		  	\ge \frac{\Adv^{\indcca}_{\adv, \sch}(\sp, \rt, \qr_{\dec}, \qr_{\hash}, \qr_{\gash})}{2}
+		   	- \frac{2\qr_{\dec}\qr_{\gash} + \qr_{\dec} + \qr_{\gash}}{2^{\sp_0}}
+		   	- \frac{2\qr_{\dec}}{2^{\sp_1}}.
+		$$
+	  이 때, $\rt' \le \rt \cdot \qr_{\hash} \cdot \qr_{\gash} \cdot (\comp{\td} +
+	   \bigo(1))$이고, $\comp{\td}$는 트랩도어 치환 $\td$의 시간 복잡도를 의미한다.
+	\end{lemma}
+\end{tcolorbox}
 
+% \begin{tcolorbox}
+% 	우리는 $\text{Succ}^{\text{ow}}(\tau)$, (그리고 각각 $\text{Succ}^{\text{pd-ow}}(\tau)$ 및 $\text{Succ}^{\text{s-pd-ow}}(\ell, \tau)$)를 최대 성공 확률 $\text{Succ}^{\text{ow}}(\mathcal{A})$ (그리고 각각 $\text{Succ}^{\text{pd-ow}}(\mathcal{A})$ 및 $\text{Succ}^{\text{s-pd-ow}}(\mathcal{A})$)로 정의한다. 여기서 최대값은 실행 시간이 $\tau$ 이하로 제한된 모든 공격자(adversary)에 대해 계산된다.
 
+% 세 번째 경우에서는 $\mathcal{A}$가 $\ell$개의 원소를 포함하는 집합을 출력한다는 추가적인 제한이 존재한다. 따라서, 모든 $\tau$ 및 $\ell \geq 1$에 대해 다음이 성립함이 분명하다.
 
-우리는 보조정리 2를 세 단계로 증명한다. 첫 번째 단계에서는 $\indcca$ 적대자
-$\adv$를 부분 도메인 일방성(partial-domain one-wayness) $f$를 깨뜨리는 알고리즘
-$\bdv$로 환원하는 과정을 제시한다. 현재의 증명에서는 원본 논문 [3]에서와 같은
-전체 도메인 일방성(full-domain one-wayness)이 아니라, 부분 도메인 일방성
-하에서의 보안성에만 관심을 둔다. 두 번째 단계에서는 이 환원에서 사용된 복호화
-오라클 시뮬레이션이 부분 도메인 일방성 하에서 압도적인 확률로 올바르게 동작함을
-보인다. 이 부분은 원본 증명 [3]과 다르며, 최근 발견된 오류 [15]를 수정한다.
-마지막으로, 우리는 복호화 오라클 시뮬레이션에 대한 위에서 언급한 분석을 포함하여
-전체적인 환원의 성공 확률을 분석한다.
+% $$
+% \text{Succ}^{\text{s-pd-ow}}(\ell, \tau) \geq \text{Succ}^{\text{pd-ow}}(\tau) \geq \text{Succ}^{\text{ow}}(\tau).
+% $$
 
-이 첫 번째 부분에서는 환원이 어떻게 작동하는지를 다시 살펴본다. $\adv$를
-$(\genkey, \enc, \dec)$의 $\indcca$ 공격자로 가정하자. 시간 제한 $\rt$ 내에서,
-$\adv$는 복호화 오라클에 대해 $\qr_{\dec}$개의 질의를 하고, 무작위 오라클 $\hash,
-\gash$에 대해 각각 $\qr_{\hash}, \qr_{\gash}$개의 질의를 수행하며, 특정 확률
-$\negl$보다 높은 능력치로 올바른 평문을 구별해낸다. 이제 환원 $\bdv$을 설명한다.
+% 또한, 공격자가 반환한 집합에서 무작위로 원소를 선택함으로써 집합 부분 도메인 단방향성(Set Partial-Domain One-Wayness)을 깨뜨릴 수 있으며, 그 확률은 $\text{Succ}^{\text{s-pd-ow}}(\mathcal{A}) / \ell$이다. 이를 통해 다음의 부등식이 성립한다.
+
+% $$
+% \text{Succ}^{\text{pd-ow}}(\tau) \geq \text{Succ}^{\text{s-pd-ow}}(\ell, \tau) / \ell.
+% $$
+
+% 그러나 특정한 함수 $f$에 대해 보다 효율적인 환원이 존재할 수도 있다. 또한, 어떤 경우에는 세 가지 문제 모두 다항식적으로 동등할 수 있다. 이는 RSA 치환(RSA permutation)의 경우에 해당하며, 따라서 이에 대한 결과는 6장에서 다룬다.
+% \end{tcolorbox}
+
+% 우리는 보조정리 2를 세 단계로 증명한다. 첫 번째 단계에서는 $\indcca$ 적대자
+% $\adv$를 부분 도메인 일방성(partial-domain one-wayness) $f$를 깨뜨리는 알고리즘
+% $\bdv$로 환원하는 과정을 제시한다. 현재의 증명에서는 원본 논문 [3]에서와 같은
+% 전체 도메인 일방성(full-domain one-wayness)이 아니라, 부분 도메인 일방성
+% 하에서의 보안성에만 관심을 둔다. 두 번째 단계에서는 이 환원에서 사용된 복호화
+% 오라클 시뮬레이션이 부분 도메인 일방성 하에서 압도적인 확률로 올바르게 동작함을
+% 보인다. 이 부분은 원본 증명 [3]과 다르며, 최근 발견된 오류 [15]를 수정한다.
+% 마지막으로, 우리는 복호화 오라클 시뮬레이션에 대한 위에서 언급한 분석을 포함하여
+% 전체적인 환원의 성공 확률을 분석한다.
+
+% 이 첫 번째 부분에서는 환원이 어떻게 작동하는지를 다시 살펴본다. $\adv$를
+% $(\genkey, \enc, \dec)$의 $\indcca$ 공격자로 가정하자. 시간 제한 $\rt$ 내에서,
+% $\adv$는 복호화 오라클에 대해 $\qr_{\dec}$개의 질의를 하고, 무작위 오라클 $\hash,
+% \gash$에 대해 각각 $\qr_{\hash}, \qr_{\gash}$개의 질의를 수행하며, 특정 확률
+% $\negl$보다 높은 능력치로 올바른 평문을 구별해낸다. 이제 환원 $\bdv$을 설명한다.
 
 \begin{tcolorbox}[colback=white]
 	\centering
