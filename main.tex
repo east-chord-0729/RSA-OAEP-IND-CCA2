@@ -154,13 +154,13 @@ $\tdsch$에 대한 일방향성(One-wayness) 실험 $\Exp^{\ow}_{\tdsch, \sp}(\a
 $\adv$의 능력치 $\Adv^{\ow}_{\adv,
 \tdsch}(\sp, \rt)$를 다음과 같이 정의한다.
 $$
-	\Adv^{\ow}_{\adv, \tdsch}(\sp, \rt) := \Pr[\Exp^{\ow}_{\tdsch, \sp}(\adv; \rt) = 1].
+	\Adv^{\ow}_{\tdsch, \sp}(\adv; \rt) := \Pr[\Exp^{\ow}_{\tdsch, \sp}(\adv; \rt) = 1].
 $$
-공격자 $\adv$의 능력치가 어떤 $\negl$에 대해 다음을 만족할 때, $\tdsch$가 $(\rt,
-\negl)$-일방향성을 가진다고 한다.
-$$
-	\Adv^{\ow}_{\adv, \tdsch}(\sp, \rt) \le \negl.
-$$
+% 공격자 $\adv$의 능력치가 어떤 $\negl$에 대해 다음을 만족할 때, $\tdsch$가 $(\rt,
+% \negl)$-일방향성을 가진다고 한다.
+% $$
+% 	\Adv^{\ow}_{\adv, \tdsch}(\sp, \rt) \le \negl.
+% $$
 
 \subsection{Partial-domain OW trapdoor permutation}
 
@@ -191,15 +191,15 @@ $$
   \end{tabularx}
 \end{tcolorbox}
 
-공격자 $\adv$의 능력치 $\Adv^{\owpd}_{\adv, \tdsch}(\sp, \rt)$를 다음과 같이 정의한다.
+공격자 $\adv$의 능력치 $\Adv^{\owpd}_{\tdsch, \sp}(\adv; \rt)$를 다음과 같이 정의한다.
 $$
-	\Adv^{\owpd}_{\adv, \tdsch}(\sp, \rt) := \Pr[\Exp^{\owpd}_{\tdsch, \sp}(\adv; \rtimes) = 1].
+	\Adv^{\owpd}_{\tdsch, \sp}(\adv; \rt) := \Pr[\Exp^{\owpd}_{\tdsch, \sp}(\adv; \rt) = 1].
 $$
-동작시간 $\rt$를 가지는 공격자 $\adv$의 능력치가 어떤 $\negl$에 대해 다음을
-만족할 때, $\tdsch$가 $(\rt, \negl)$-부분 일방향성을 가진다고 한다.
-$$
-	\Adv^{\owpd}_{\adv, \tdsch}(\sp, \rt) \le \negl.
-$$
+% 동작시간 $\rt$를 가지는 공격자 $\adv$의 능력치가 어떤 $\negl$에 대해 다음을
+% 만족할 때, $\tdsch$가 $(\rt, \negl)$-부분 일방향성을 가진다고 한다.
+% $$
+% 	\Adv^{\owpd}_{\adv, \tdsch}(\sp, \rt) \le \negl.
+% $$
 
 \subsection{Set partial-domain OW trapdoor permutation}
 
@@ -219,15 +219,15 @@ $\Exp^{\owpds}_{\tdsch, \sp}(\adv; \rt, l)$을 다음과 같이 정의한다.
   \end{tabularx}
 \end{tcolorbox}
 
-공격자 $\adv$의 능력치 $\Adv^{\owpds}_{\adv, \tdsch}(\sp, \rt, l)$를 다음과 같이 정의한다.
+공격자 $\adv$의 능력치 $\Adv^{\owpds}_{\tdsch, \sp}(\adv; \rt, l)$를 다음과 같이 정의한다.
 $$
-	\Adv^{\owpds}_{\adv, \tdsch}(\sp, \rt, l) := \Pr[\Exp^{\owpds}_{\tdsch, \sp}(\adv; \rt, l) = 1].
+	\Adv^{\owpds}_{\tdsch, \sp}(\adv; \rt, l) := \Pr[\Exp^{\owpds}_{\tdsch, \sp}(\adv; \rt, l) = 1].
 $$
-동작시간 $\rt$를 가지는 공격자 $\adv$의 능력치가 어떤 $\negl$에 대해 다음을
-만족할 때, $\tdsch$가 $(l, \rt, \negl)$-집합 부분 일방향성을 가진다고 한다.
-$$
-	\Adv^{\owpds}_{\adv, \tdsch}(\sp, \rt, l) \le \negl.
-$$
+% 동작시간 $\rt$를 가지는 공격자 $\adv$의 능력치가 어떤 $\negl$에 대해 다음을
+% 만족할 때, $\tdsch$가 $(l, \rt, \negl)$-집합 부분 일방향성을 가진다고 한다.
+% $$
+% 	\Adv^{\owpds}_{\adv, \tdsch}(\sp, \rt, l) \le \negl.
+% $$
 
 \subsection{IND security against CCA2}
 
@@ -245,10 +245,10 @@ $$
 	\ctspace$를 입력 받아 $\msg \in \msgspace$를 출력한다.
 \end{itemize}
 
-선택 암호문 공격(Adaptive chosen ciphertext attack, 이하 CCA2)을 수행하고 복호화
-오라클에 $\qr$회 질의하는 공격자 $\adv$와 공개키 암호 체계 $\sch$에 대해,
-의미론적(Semantic, 혹은 indistinguishability, 이하 IND) 안전성 실험
-$\Exp^{\indcca}_{\sch, \sp}(\adv; \qr)$을 다음과 같이 정의한다.
+동작시간 $\rt$를 가지고 복호화 오라클에 $\qr$회 질의하는 공격자 $\adv$와 공개키
+암호 체계 $\sch$에 대해, 선택 암호문 공격(Adaptive chosen ciphertext attack,
+이하 CCA2)에 대한 구별불가능성(Indistinguishability)
+실험 $\Exp^{\indcca}_{\sch, \sp}(\adv; \rt, \qr)$을 다음과 같이 정의한다.
 
 \begin{tcolorbox}[colback=white]
 	\centering
@@ -261,7 +261,7 @@ $\Exp^{\indcca}_{\sch, \sp}(\adv; \qr)$을 다음과 같이 정의한다.
 		\\ 
 		& $\xleftarrow{\msg^*_0, \msg^*_1}$ & $\adv$ chooses $\msg^*_0, \msg^*_1 \in \msgspace$ such that $|\msg^*_0| = |\msg^*_1|$ and $\msg^*_0 \neq \msg^*_1$ \\
 		\\
-		$\bit \rgets \set{0, 1}, \coin \rgets \coinspace$ \\ $\ct^* \gets \enc_{\pk}(\msg^*_{\bit}; \coin)$ & $\xrightarrow{\ct^*}$ & \\
+		$\bit \rgets \set{0, 1}, \coin^* \rgets \coinspace$ \\ $\ct^* \gets \enc_{\pk}(\msg^*_{\bit}; \coin^*)$ & $\xrightarrow{\ct^*}$ & \\
 		\\
 		\multicolumn{3}{c}{\cellcolor{gray!20}$\orc^{\dec_{\sk}}$ Query Phase 2} \\
 		\\
@@ -269,17 +269,18 @@ $\Exp^{\indcca}_{\sch, \sp}(\adv; \qr)$을 다음과 같이 정의한다.
   \end{tabularx}
 \end{tcolorbox}
 
-공격자 $\adv$의 능력치 $\Adv^{\indcca}_{\adv, \sch}(\sp, \qr)$를 다음과 같이 정의한다.
+공격자 $\adv$의 능력치 $\Adv^{\indcca}_{\sch, \sp}(\adv; \rt, \qr)$를 다음과 같이 정의한다.
 $$
-	\Adv^{\indcca}_{\adv, \sch}(\sp, \qr) = 2 \cdot \Pr[\Exp^{\indcca}_{\sch, \sp}(\adv; \qr) = 1] - 1.
+	\Adv^{\indcca}_{\sch, \sp}(\adv; \rt, \qr) = 2 \cdot \Pr[\Exp^{\indcca}_{\sch, \sp}(\adv; \rt, \qr) = 1] - 1.
 $$
 
 \subsection{IND security against CCA2 in ROM}
 
-복호화 오라클에 $\qr_{\dec}$회, 랜덤 오라클에 $\qr_{\hash}$회 질의하는 CCA2
-공격자 $\adv$와 공개키 암호 체계 $\sch$에 대해, 랜덤 오라클 모델(Random oracle
-model)에서의 IND 실험 $\Exp^{\indccarom}_{\sch, \sp}(\adv; \qr_{\dec},
-\qr_{\hash})$을 다음과 같이 정의한다.
+동작시간 $\rt$를 가지고  복호화 오라클에 $\qr_{\dec}$회, 랜덤 오라클에
+$\qr_{\hash}$회 질의하는 공격자 $\adv$와 공개키 암호 체계 $\sch$에 대해,
+랜덤 오라클 모델(Random oracle model)에서의 CCA2에 대한 구별불가능성 실험
+$\Exp^{\indccarom}_{\sch, \sp}(\adv; \rt, \qr_{\dec}, \qr_{\hash})$을 다음과
+같이 정의한다.
 
 \begin{tcolorbox}[colback=white]
 	\centering
@@ -292,7 +293,7 @@ model)에서의 IND 실험 $\Exp^{\indccarom}_{\sch, \sp}(\adv; \qr_{\dec},
 		\\
 		& $\xleftarrow{\msg^*_0, \msg^*_1}$ & $\adv$ chooses $\msg^*_0, \msg^*_1 \in \msgspace$ such that $|\msg^*_0| = |\msg^*_1|$ and $\msg^*_0 \neq \msg^*_1$ \\
 		\\
-		$\bit \rgets \set{0, 1}, \coin \rgets \coinspace$ \\ $\ct^* \gets \enc_{\pk}(\msg^*_{\bit}; \coin)$ & $\xrightarrow{\ct^*}$ & \\
+		$\bit \rgets \set{0, 1}, \coin^* \rgets \coinspace$ \\ $\ct^* \gets \enc_{\pk}(\msg^*_{\bit}; \coin^*)$ & $\xrightarrow{\ct^*}$ & \\
 		\\
 		\multicolumn{3}{c}{\cellcolor{gray!20}$\orc^{\hash}, \orc^{\dec_{\sk}}$ Query Phase 2} \\
 		\\
@@ -300,11 +301,11 @@ model)에서의 IND 실험 $\Exp^{\indccarom}_{\sch, \sp}(\adv; \qr_{\dec},
   \end{tabularx}
 \end{tcolorbox}
 
-공격자 $\adv$의 능력치 $\Adv^{\indccarom}_{\adv, \sch}(\sp, \qr_{\dec},
+공격자 $\adv$의 능력치 $\Adv^{\indccarom}_{\sch, \sp}(\adv; \rt, \qr_{\dec},
 \qr_{\hash})$를 다음과 같이 정의한다.
 $$
-	\Adv^{\indccarom}_{\adv, \sch}(\sp, \qr_{\dec},
-	\qr_{\hash}) = 2 \cdot \Pr[\Exp^{\indccarom}_{\sch, \sp}(\adv; \qr_{\dec},
+	\Adv^{\indccarom}_{\sch, \sp}(\adv; \rt, \qr_{\dec},
+	\qr_{\hash}) = 2 \cdot \Pr[\Exp^{\indccarom}_{\sch, \sp}(\adv; \rt, \qr_{\dec},
 	\qr_{\hash}) = 1] - 1.
 $$
 
@@ -364,14 +365,14 @@ $(\genkey, \enc, \dec)$는 다음과 같이 동작한다.
 
 \begin{tcolorbox}[colback=white]
 	\begin{lemma}
-		공격자 $\adv$를 OAEP 변환 $(\genkey, \enc, \dec)$에 대해 $\rt$를 가지고,
+		공격자 $\adv$를 OAEP 변환 $(\genkey, \enc, \dec)$에 대해 동작시간 $\rt$를 가지고,
 		복호화 오라클 $\orc^{\dec}$와 랜덤 오라클 $\orc^{\hash}, \orc^{\gash}$에
 		각각 $\qr_{\dec}, \qr_{\hash}, \qr_{\gash}$회 질의하는
 		$\textsf{IND-CCA2}$ 공격자라 하자. 어떤 $\owpds$ 공격자 $\bdv$에 대해,
 		다음을 만족한다.
 		$$
-			\Adv^{\owpds}_{\bdv, \tdsch}(\sp, \rt', \qr_{\hash})
-		  	\ge \frac{\Adv^{\indcca}_{\adv, \sch}(\sp, \rt, \qr_{\dec}, \qr_{\hash}, \qr_{\gash})}{2}
+			\Adv^{\owpds}_{\tdsch, \sp}(\bdv; \rt', \qr_{\hash})
+		  	\ge \frac{\Adv^{\indcca}_{\sch, \sp}(\adv; \rt, \qr_{\dec}, \qr_{\hash}, \qr_{\gash})}{2}
 		   	- \frac{2\qr_{\dec}\qr_{\gash} + \qr_{\dec} + \qr_{\gash}}{2^{\sp_0}}
 		   	- \frac{2\qr_{\dec}}{2^{\sp_1}}.
 		$$
@@ -414,62 +415,28 @@ $(\genkey, \enc, \dec)$는 다음과 같이 동작한다.
 % \gash$에 대해 각각 $\qr_{\hash}, \qr_{\gash}$개의 질의를 수행하며, 특정 확률
 % $\negl$보다 높은 능력치로 올바른 평문을 구별해낸다. 이제 환원 $\bdv$을 설명한다.
 
-\begin{tcolorbox}[colback=white]
-	\centering
-	\begin{tabularx}{\linewidth}{CcCcC}
-		\underline{Challenger $\ch$} & 
-		$\xLeftrightarrow{\Exp^{\owfpd}_{f, \sp}}$ & 
-		\underline{Adversary $\bdv$} &
-		$\xLeftrightarrow{\Exp^{\indccarom}_{\sch, \sp}}$ &
-		\underline{Adversary $\adv$} \\
-
-		 \\
-
-		 & 
-		$\xrightarrow{f}$ &  &  &
-	     \\
-
-		 \\
-
-		$(s^*, t^*) \rgets \set{0, 1}^{\sp - \sp_0} \times \set{0, 1}^{\sp_0}$ \\
-		$\ct^* \gets f(s^*, t^*)$ &
-		$\xrightarrow{\ct^*}$ & & &
-		 \\
-
-		 \\
-
-		 & & $\orcl_{\hash}, \orcl_{\gash} \gets \set{}, \set{}$ & $\xrightarrow{1^{\sp}, \pk}$ & \\
-
-		 \\
-
-		 & & \multicolumn{3}{c}{\cellcolor{gray!20}$\orc^{\dec_{\sk}}, \orc^{\hash}, \orc^{\gash}$ Query Phase 1} \\
-
-		 \\
-
-		& & & 
-		$\xleftarrow{\msg^*_0, \msg^*_1}$ & 
-		$\adv$ chooses $\msg^*_0, \msg^*_1 \in \msgspace$ such that 
-		$|\msg^*_0| = |\msg^*_1|$ and $\msg^*_0 \neq \msg^*_1$ \\
-
-		 \\
-
-		 & & & $\xrightarrow{\ct^*}$ & \\
-
-		 \\
-
-		 & & \multicolumn{3}{c}{\cellcolor{gray!20}$\orc^{\dec_{\sk}}, \orc^{\hash}, \orc^{\gash}$ Query Phase 2} \\
-
-		 \\
-
-		 \\
-
-		Return $[s' \same s^*]$ & 
-		$\xleftarrow{s'}$ & 
-		$\bdv$ chooses $s' \in \set{0, 1}^{\sp - \sp_0}$ &
-		$\xleftarrow{\bit'}$ &
-		$\adv$ chooses $\bit' \in \set{0, 1}$ \\
-  \end{tabularx}
-\end{tcolorbox}
+% \begin{tcolorbox}[colback=white]
+% 	\centering
+% 	\begin{tabularx}{\linewidth}{CcCcC}
+% 		\underline{Challenger $\ch$} & $\xLeftrightarrow{\Exp^{\owfpd}_{f, \sp}}$ & \underline{Adversary $\bdv$} & $\xLeftrightarrow{\Exp^{\indccarom}_{\sch, \sp}}$ & \underline{Adversary $\adv$} \\
+% 		\\
+% 		$(\pk, \sk) \gets \genkey(1^{\sp})$ & &  &  & \\
+% 		\\
+% 		$(s^*, t^*) \rgets \set{0, 1}^{\sp - \sp_0} \times \set{0, 1}^{\sp_0}$ \\ $\ct^* \gets \td_{\pk}(s^*, t^*)$ & $\xrightarrow{1^{\sp}, \pk, \ct^*}$ & & & \\
+% 		\\
+% 		 & & $\orcl_{\hash}, \orcl_{\gash} \gets \set{}, \set{}$ & $\xrightarrow{1^{\sp}, \pk}$ & \\
+% 		\\
+% 		 & & \multicolumn{3}{c}{\cellcolor{gray!20}$\orc^{\dec_{\sk}}, \orc^{\hash}, \orc^{\gash}$ Query Phase 1} \\
+% 		\\
+% 		& & & $\xleftarrow{\msg^*_0, \msg^*_1}$ & $\adv$ chooses $\msg^*_0, \msg^*_1 \in \msgspace$ such that $|\msg^*_0| = |\msg^*_1|$ and $\msg^*_0 \neq \msg^*_1$ \\
+% 		\\
+% 		 & & $\bit \rgets \set{0, 1}, \coin^* \gets \coinspace$ & $\xrightarrow{\ct^*}$ & \\
+% 		\\
+% 		 & & \multicolumn{3}{c}{\cellcolor{gray!20}$\orc^{\dec_{\sk}}, \orc^{\hash}, \orc^{\gash}$ Query Phase 2} \\
+% 		\\
+% 		Return $[s' \same s^*]$ & $\xleftarrow{s'}$ & $\bdv$ chooses $s' \in \set{0, 1}^{\sp - \sp_0}$ & $\xleftarrow{\bit'}$ & $\adv$ chooses $\bit' \in \set{0, 1}$ \\
+%   \end{tabularx}
+% \end{tcolorbox}
 
 % 이 실험에서 세 개의 오라클을 $\bdv$가 처리하기 때문에, 다음을 고려해야한다.
 % \begin{itemize}
@@ -481,38 +448,38 @@ $(\genkey, \enc, \dec)$는 다음과 같이 동작한다.
 % 	\item 복호화 오라클은 $\bdv$가 비밀키를 모름에도 수행할 수 있어야 한다.
 % \end{itemize}
 
-\textbf{How $\bdv$ simulate $\orc^{\gash}$?}
+% \textbf{How $\bdv$ simulate $\orc^{\gash}$?}
 
-\begin{itemize}
-	\item If $\gamma \in \orcl_{\gash}$, then response $\gash_{\gamma}$
-	and $\orcl_{\gash} \gets \orcl_{\gash} \cap (\gamma, \gash_{\gamma})$.
-	\item Otherwise, do following:
-	\begin{itemize}
-		\item For some $\delta \in \orcl_{\hash}$, if $c^* = f(\delta, \gamma \xor
-		\hash_{\delta})$, then $\gash_{\gamma} \gets \delta \xor (\msg_{\bit} \parallel
-		0^{\sp_1})$.
-		\item For all $\delta \in \orcl_{\hash}$, if $c^* \neq f(\delta, \gamma \xor
-		\hash_{\delta})$, then $\gash_{\gamma} \rgets \set{0 ,1}^{\sp}$.
-		\item response $\gash_{\gamma}$ and $\orcl_{\gash} \gets \orcl_{\gash} \cap
-		(\gamma, \gash_{\gamma})$.
-	\end{itemize}
-\end{itemize}
+% \begin{itemize}
+% 	\item If $\gamma \in \orcl_{\gash}$, then response $\gash_{\gamma}$
+% 	and $\orcl_{\gash} \gets \orcl_{\gash} \cap (\gamma, \gash_{\gamma})$.
+% 	\item Otherwise, do following:
+% 	\begin{itemize}
+% 		\item For some $\delta \in \orcl_{\hash}$, if $c^* = f(\delta, \gamma \xor
+% 		\hash_{\delta})$, then $\gash_{\gamma} \gets \delta \xor (\msg_{\bit} \parallel
+% 		0^{\sp_1})$.
+% 		\item For all $\delta \in \orcl_{\hash}$, if $c^* \neq f(\delta, \gamma \xor
+% 		\hash_{\delta})$, then $\gash_{\gamma} \rgets \set{0 ,1}^{\sp}$.
+% 		\item response $\gash_{\gamma}$ and $\orcl_{\gash} \gets \orcl_{\gash} \cap
+% 		(\gamma, \gash_{\gamma})$.
+% 	\end{itemize}
+% \end{itemize}
 
-\textbf{How $\bdv$ simulate $\orc^{\hash}$?}
+% \textbf{How $\bdv$ simulate $\orc^{\hash}$?}
 
-\begin{itemize}
-	\item If $\delta \in \orcl_{\hash}$, then response $\hash_\delta$.
-	\item Otherwise, response $\hash_{\delta} \rgets \set{0 ,1}^{\sp}$ and
-	$\orcl_{\hash} \gets \orcl_{\hash} \cap (\delta, \hash_{\delta})$.
-\end{itemize}
+% \begin{itemize}
+% 	\item If $\delta \in \orcl_{\hash}$, then response $\hash_\delta$.
+% 	\item Otherwise, response $\hash_{\delta} \rgets \set{0 ,1}^{\sp}$ and
+% 	$\orcl_{\hash} \gets \orcl_{\hash} \cap (\delta, \hash_{\delta})$.
+% \end{itemize}
 
-\textbf{How $\bdv$ simulate $\orc^{\dec_{\sk}}$?} 
+% \textbf{How $\bdv$ simulate $\orc^{\dec_{\sk}}$?} 
 
-\begin{itemize}
-	\item If $\ct = f(\delta, \hash_{\delta} \xor \gamma)$ and 
-	$[\gash_{\gamma} \xor \delta]_{\sp_1} = 0^{\sp_1}$, then
-	response $[\gash_{\gamma} \xor \delta]^n$.
-	\item Otherwise, response $\reject$.
-\end{itemize}
+% \begin{itemize}
+% 	\item If $\ct = f(\delta, \hash_{\delta} \xor \gamma)$ and 
+% 	$[\gash_{\gamma} \xor \delta]_{\sp_1} = 0^{\sp_1}$, then
+% 	response $[\gash_{\gamma} \xor \delta]^n$.
+% 	\item Otherwise, response $\reject$.
+% \end{itemize}
 
 \end{document}
