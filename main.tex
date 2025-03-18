@@ -151,7 +151,7 @@ $\tdsch$에 대한 일방향성(One-wayness) 실험 $\Exp^{\ow}_{\tdsch, \sp}(\a
   \end{tabularx}
 \end{tcolorbox}
 
-$\adv$의 능력치 $\Adv^{\ow}_{\adv,
+$\adv$의 능력치 $\Adv^{\ow}_{\adv;
 \tdsch}(\sp, \rt)$를 다음과 같이 정의한다.
 $$
 	\Adv^{\ow}_{\tdsch, \sp}(\adv; \rt) := \Pr[\Exp^{\ow}_{\tdsch, \sp}(\adv; \rt) = 1].
@@ -215,7 +215,7 @@ $\Exp^{\owpds}_{\tdsch, \sp}(\adv; \rt, l)$을 다음과 같이 정의한다.
 		\\
 		$(s^*, t^*) \rgets \set{0, 1}^{\mlen + \sp_1} \times \set{0, 1}^{\sp_0}$ \\ $y^* \gets \td_{\pk}(s^*, t^*)$ & $\xrightarrow{1^{\sp}, \pk, y^*}$ & \\
 		\\
-		Return $[s'_i \same s^*]$ & $\xleftarrow{s'_0, s'_1, \cdots, s'_{l-1}}$ & $\adv$ chooses $s'_0, s'_1, \cdots, s'_{l-1} \in \set{0, 1}^{\mlen + \sp_1}$ \\
+		Return $[s^* \isin S']$ & $\xleftarrow{S'}$ & $\adv$ chooses $S' = \set{s_i \in \set{0, 1}^{\mlen + \sp_1}: 0 \le i \le l-1}$ \\
   \end{tabularx}
 \end{tcolorbox}
 
@@ -311,7 +311,11 @@ $$
 
 \newpage
 \section{RSA-OAEP}
-다음과 같은 두 해시 함수 $H, G$를 준비한다.
+다음과 같은 트랩도어 치환 $\td$를 고려한다.
+$$
+	\td_{\pk}: \set{0, 1}^{\mlen + \sp_1} \times \set{0, 1}^{\sp_0} \to \set{0, 1}^{\mlen + \sp_1} \times \set{0, 1}^{\sp_0}.
+$$
+그리고 두 해시 함수 $H, G$를 다음과 같이 준비한다.
 $$
 	\hash: \set{0, 1}^{\sp_0} \to \set{0, 1}^{\sp - \sp_0} \quad
 	\gash: \set{0, 1}^{\sp - \sp_0} \to \set{0, 1}^{\sp_0}.
