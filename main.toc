@@ -5,5 +5,8 @@
 \contentsline {subsection}{\numberline {2.3}Set partial-domain OW trapdoor permutation}{4}{subsection.2.3}%
 \contentsline {subsection}{\numberline {2.4}IND security against CCA2}{4}{subsection.2.4}%
 \contentsline {subsection}{\numberline {2.5}IND security against CCA2 in ROM}{5}{subsection.2.5}%
-\contentsline {section}{\numberline {3}RSA-OAEP}{6}{section.3}%
-\contentsline {section}{\numberline {4}증명}{6}{section.4}%
+\contentsline {section}{\numberline {3}RSA-OAEP}{7}{section.3}%
+\contentsline {section}{\numberline {4}증명}{7}{section.4}%
+\contentsline {subsection}{\numberline {4.1}증명: Reduction and simulation}{8}{subsection.4.1}%
+\contentsline {subsection}{\numberline {4.2}증명: 사건 정의}{9}{subsection.4.2}%
+\contentsline {subsection}{\numberline {4.3}증명: Analysis of the Decryption Oracle Simulation}{10}{subsection.4.3}%
