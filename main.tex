@@ -38,7 +38,7 @@
 \newtheorem{theorem}{정리}
 \newtheorem{lemma}{보조정리}
 \theoremstyle{definition}
-\newtheorem{memo}{메모}
+\newtheorem{memo}{메모}[section]
 
 \usepackage{setspace}
 \setstretch{1.15} % 이 한 줄이면 끝!
@@ -839,5 +839,12 @@ $\bdv$는 다음과 같이 응답한다.
 
 % 만약 $\neg \text{CBad} \wedge \text{AskRS}$가 성립한다면, 시뮬레이션은
 % 완벽하며 실패하지 않는다. 따라서, 우리는 보완적인 사건들을 고려해야 한다.
+
+\include{game.tex}
+
+\appendix
+
+\include{appendix_lemma.tex}
+
 
 \end{document}

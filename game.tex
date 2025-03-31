@@ -1,0 +1,404 @@
+
+\section{Journal of Cryptology}
+
+\newcommand{\game}{\textsf{GAME}}
+\newcommand{\pe}{\mathcal{PE}}
+\newcommand{\glist}{\mathcal{L}_{G}}
+\newcommand{\hlist}{\mathcal{L}_{H}}
+
+본 절에서는 Journal of Cryptology의 RSA-OAEP is Secure under the RSA Assumption
+논문 내용을 정리했다. 기존 논문과 달리 여기서는 여러 개의 $\game$을 정의해, 각
+$\game$의 성공 확률 차이를 활용하여 공격자의 능력치 관계를 표현한다.
+
+%TODO https://link.springer.com/article/10.1007/s00145-002-0204-y 링크 각주로 넣기.
+
+\subsection{평문 추출기}
+
+평문추출기 $\pe$를 다음과 같이 정의한다.
+
+\begin{memo}
+	평문 추출기(plaintext extractor)는 시뮬레이터가 그 오라클을 흉내 내기 위해
+	만든 도구이다. 실제 복호를 하는 것이 아니고, 복호 결과를 추출하는 의미로
+	평문 추출기로 부른다.
+\end{memo}
+
+\begin{tcolorbox}
+	평문 추출기 $\pe$의 입력은 다음과 같다.
+	\begin{itemize}
+		\item 무작위 오라클 $G, H$에 대한 질의 응답 쌍을 모아 놓은 두 개의
+		리스트 $\orcl_{G}, \orcl_{H}$.
+		\item 유효한 암호문 $y^*$.
+		\item 후보 암호문 $y \ne y^*$. 추출기는 $y$를 복호해야한다.
+	\end{itemize}
+	추출기 $\pe$의 동작 방식은 다음과 같다.
+	\begin{itemize}
+		\item 암호문 $y = f(s \parallel t)$가 주어지면, $\orcl_{G}$에 있는 모든
+		$(\gamma, G_\gamma)$와 $\orcl_{H}$에 있는 모든 $(\delta, H_\delta)$에 대해
+		다음을 계산한다. 
+		$$
+		\sigma = \delta,\quad \theta = \gamma \oplus H_\delta,\quad \mu = G_\gamma \oplus \delta.
+		$$
+		\item 그리고 다음 조건을 검사한다.
+		$$
+			y = f(\sigma \parallel \theta) \quad \text{and} \quad [\mu]_{k_1} = 0^{k_1}.
+		$$
+		\item 조건이 만족되면, $\pe$는 $\mu$의 앞부분, 즉 $[\mu]^n$을 평문으로
+		출력하고 종료한다. 조건을 만족하는 조합이 없다면, $\pe$는 $\reject$
+		메시지를 반환한다.
+	\end{itemize}
+\end{tcolorbox}
+
+\begin{memo}
+	평문 추출기 $\pe$가 $y^*$를 입력받는 이유는, $y^*$는 공격자가 받은
+	챌린지 암호문이기 때문에, 해당 암호문을 복호하지 않도록 막기 위해서이다.
+\end{memo}
+
+리스트의 순서에 관계없이, $\pe$의 출력은 항상 유일하게 정의된다는 것을 쉽게
+확인할 수 있다. 함수 $f$가 순열이므로, $\sigma = s$는 유일하게 결정되고, 따라서
+$\delta$도 유일하게 결정된다. 또한 $\glist$와 $\hlist$는 각각 함수 $G$와 $H$에
+대한 입력 출력 쌍들이며, 하나의 입력에 대해 대응되는 출력은 최대 하나이기
+때문에, $H_\delta$ 역시 유일하게 결정된다. 마찬가지로 $\theta = t$도 유일하게
+결정되며, 따라서 $\gamma$와 $G_\gamma$도 유일하게 결정된다. 결국 선택될 수 있는
+$\mu$는 최대 하나이며, 그 출력 여부는 조건 $[\mu]_{k_1} = 0^{k_1}$을
+만족하는지에 따라 결정된다.
+
+\begin{memo}
+	원래 복호화 오라클은 출력이 항상 유일하게 정의되기 때문에, $\pe$의 출력도
+	항상 유일하게 정의됨을 보여야 한다. 공격자가 $\pe$에 같은 입력을 넣었을 때,
+	다른 출력을 얻으면 안된다.
+\end{memo}
+
+\newpage
+\subsection{게임 구성}
+
+이후에서 $y^*$는 암호화 오라클로부터 얻은 도전 암호문을 의미한다. 우리는 복호화
+오라클 대신 평문 추출기를 사용하는 상황을 상정하고 있으며, 의미론적 보안을
+모순시키려는 맥락에서, $y^*$가 메시지 $m_b$에 대한 암호문이라고 가정한다. 또한
+$y^*$의 난수 시드를 $r^*$라고 표기한다. 이때 다음 관계가 성립한다.
+$$
+	r^* = H(s^*) \oplus t^* \quad \text{and} \quad G(r^*) = s^* \oplus (m_b \parallel 0^{k_1})
+$$
+
+이후의 모든 별표가 없는 변수들은 복호화 질의에 해당한다. 우리는 이제 이전 증명의
+간단한 확장으로서, 복호화 오라클을 활용하는 완전한 증명을 제시한다. 이
+증명에서는 앞서 정의한 평문 추출기가 실패할 수 있는 모든 경우를 순차적으로
+배제해가며 논리를 전개한다.
+
+\subsubsection{0 번째 게임}
+
+\begin{tcolorbox}[colback=white]
+	\centering
+	\begin{tabularx}{\linewidth}{CcC}
+		\underline{Challenger $\ch$} & $\xLeftrightarrow{\game_0}$ & \underline{Adversary $\adv$} \\
+		\\
+		$\orcl_{G}, \orcl_{H} \gets \set{}, \set{}$ & \\
+		$(\pk, \sk) \gets \genkey(1^{\sp})$ & $\xrightarrow{1^{\sp}, \pk}$ & \\
+		\\
+		\multicolumn{3}{c}{\cellcolor{gray!20}$\orc^{\dec}, \orc^{\hash}, \orc^{\gash}$ Query Phase 1} \\
+		\\
+		& $\xleftarrow{\msg^*_0, \msg^*_1}$ & $\adv$ chooses $\msg^*_0, \msg^*_1 \in \msgspace$ such that $|\msg^*_0| = |\msg^*_1|$ and $\msg^*_0 \neq \msg^*_1$ \\
+		\\
+		$\bit \rgets \set{0, 1}, r^* \rgets \set{0, 1}^{k_0}$ & & \\
+		\\
+		$s^* \gets (m_b \parallel 0^{k_0}) \xor G(r^*)$ & & \\
+		$t^* \gets r^* \xor H(s^*)$ & & \\
+		$c^* \gets f(s^* \parallel t^*)$ & $\xrightarrow{\ct^*}$ & \\
+		\\
+		\multicolumn{3}{c}{\cellcolor{gray!20}$\orc^{\dec}, \orc^{\hash}, \orc^{\gash}$ Query Phase 2} \\
+		\\
+		Return $[b' \same b]$ & $\xleftarrow{\bit'}$ & $\adv$ chooses $\bit' \in \set{0, 1}$ \\
+  \end{tabularx}
+\end{tcolorbox}
+
+\begin{memo}
+	$\game_0$는 $\indcca$ 실험과 동일하다. 여기서 사용하는 복호화 오라클
+	$\orc^{\dec}$는 평문 추출기가 아니라는 점에 주의한다.
+\end{memo}
+
+$\game_0$에서 공격자는 도전 암호문을 복호화 오라클에 질의할 수 없다. 이벤트
+$S_0$는 $\game_0$가 $1$을 반환하는 사건을 의미하며, 이후 게임 단계에서도
+유사하게 $S_i$로 표기한다. 정의에 따라, 다음이 성립한다.
+$$
+	\Pr[S_0] = \frac{1}{2} + \frac{\varepsilon}{2}.
+$$
+
+%TODO 공격자의 능력치를 e로 표현했는데, 이에 대한 설명 안넣었음.
+
+\newpage
+\subsubsection{1 번째 게임}
+
+\begin{tcolorbox}[colback=white]
+	\centering
+	\begin{tabularx}{\linewidth}{CcC}
+		\underline{Challenger $\ch$} & $\xLeftrightarrow{\game_1}$ & \underline{Adversary $\adv$} \\
+		\\
+		$\orcl_{H}, \orcl_{G} \gets \set{}, \set{}$ & & \\
+		\textcolor{red}{$r^+ \rgets \set{0, 1}^{k_0}, g^+ \rgets \set{0, 1}^{k - k_0}$} & & \\
+		\textcolor{red}{$\orcl_{G} \gets \orcl_{G} \cup \set{(r^+, g^+)}$} & & \\
+		$(\pk, \sk) \gets \genkey(1^{\sp})$ & $\xrightarrow{1^{\sp}, \pk}$ & \\
+		\\
+		\multicolumn{3}{c}{\cellcolor{gray!20}$\orc^{\dec}, \orc^{\hash}, \orc^{\gash}$ Query Phase 1} \\
+		\\
+		& $\xleftarrow{\msg^*_0, \msg^*_1}$ & $\adv$ chooses $\msg^*_0, \msg^*_1 \in \msgspace$ such that $|\msg^*_0| = |\msg^*_1|$ and $\msg^*_0 \neq \msg^*_1$ \\
+		\\
+		$\bit \rgets \set{0, 1}$ & & \\
+		\\
+		\textcolor{red}{$s^* \gets (m_b \parallel 0^{k_0}) \xor g^+$} & & \\
+		\textcolor{red}{$t^* \gets r^+ \xor H(s^*)$} & & \\
+		$c^* \gets f(s^* \parallel t^*)$ & $\xrightarrow{\ct^*}$ & \\
+		\\
+		\multicolumn{3}{c}{\cellcolor{gray!20}$\orc^{\dec}, \orc^{\hash}, \orc^{\gash}$ Query Phase 2} \\
+		\\
+		Return $[b' \same b]$ & $\xleftarrow{\bit'}$ & $\adv$ chooses $\bit' \in \set{0, 1}$ \\
+  \end{tabularx}
+\end{tcolorbox}
+
+$\game_1$에서는 난수 시드 $r^*$의 값을 명시적으로 드러내고, 그 생성을 게임
+초반으로 이동시키는 것이다. 즉, 사전에 무작위로 다음 값을 선택한다:
+$$
+	r^+ \rgets \{0,1\}^{k_0}, \quad g^+ \rgets \{0,1\}^{k - k_0}.
+$$
+그리고 이후부터는 $r^*$ 대신 $r^+$, $G(r^*)$ 대신 $g^+$를 사용한다. 
+
+\begin{memo}
+	$\game_0$에서 $s^*$를 만들 때, $r^*$를 $G$에 통과시켜 $G(r^*)$를 구하고,
+	$G(r^*)$를 이용하여 $s^*$를 만든다. 그러나 $\game_0$에서는 $G(r^*)$를
+	계산하지 않는다. 대신 $g^+$를 무작위로 생성하고, $g^+$를 이용하여 $s^*$를
+	만든다.
+\end{memo}
+
+$\game_1$은 다음 두 규칙을 따른다.
+\begin{itemize}
+	\item $r^* = r^+, s^* = (m_b \parallel 0^{k_1}) \oplus g^+$이므로, 다음
+	관계가 성립한다.
+	$$
+		t^* = r^* \oplus H(s^*), \quad
+		x^* = s^* \parallel t^*, \quad
+		y^* = f(x^*).
+	$$
+	\item 무작위 오라클 $G$에 대해 $r^+$로 질의가 들어오면, 응답은 항상 $g^+$이다.
+\end{itemize}
+
+\begin{memo}
+	즉, $\game_0$에서 $\game_1$으로 바뀌면서 달라진 것은, $G(r^*)$ 대신 무작위
+	값을 사용하여 $s^*$를 만든다는 점 뿐이라고 생각하면 된다.
+\end{memo}
+
+우리는 $(r^*, G(r^*))$ 쌍을 정확히 동일한 분포를 가지는 $(r^+, g^+)$로 대체한
+것이므로 다음을 만족한다.
+$$
+	\Pr[S_1] = \Pr[S_0]
+$$
+
+\begin{memo}
+	$\game_1$으로 바뀌면서 달라진 것은 $G(r^*)$ 대신 무작위 값 $g^+$을
+	사용한다는 점이다. $g^+$는 균등분포, $G(r^*)$도 무작위 오라클 정의에 의해
+	균등분포, 즉, 동일한 확률분포를 가진다. 그 외 모든 구조가 동일하므로,
+	공격자는 $\game_0$와 $\game_1$에서 동일한 전략을 사용한다. 따라서, $\Pr[S_1]
+	= \Pr[S_0]$을 만족한다.
+\end{memo}
+
+\newpage
+\subsubsection{2 번째 게임}
+
+\begin{tcolorbox}[colback=white]
+	\centering
+	\begin{tabularx}{\linewidth}{CcC}
+		\underline{Challenger $\ch$} & $\xLeftrightarrow{\game_2}$ & \underline{Adversary $\adv$} \\
+		\\
+		$\orcl_{H}, \orcl_{G} \gets \set{}, \set{}$ & & \\
+		$r^+ \rgets \set{0, 1}^{k_0}, g^+ \rgets \set{0, 1}^{k - k_0}$ & & \\
+		\textcolor{red}{\sout{$\orcl_{G} \gets \orcl_{G} \cup \set{(r^+, g^+)}$}} & & \\
+		$(\pk, \sk) \gets \genkey(1^{\sp})$ & $\xrightarrow{1^{\sp}, \pk}$ & \\
+		\\
+		\multicolumn{3}{c}{\cellcolor{gray!20}$\orc^{\dec}, \orc^{\hash}, \orc^{\gash}$ Query Phase 1} \\
+		\\
+		& $\xleftarrow{\msg^*_0, \msg^*_1}$ & $\adv$ chooses $\msg^*_0, \msg^*_1 \in \msgspace$ such that $|\msg^*_0| = |\msg^*_1|$ and $\msg^*_0 \neq \msg^*_1$ \\
+		\\
+		$\bit \rgets \set{0, 1}$ & & \\
+		\\
+		$s^* \gets (m_b \parallel 0^{k_0}) \xor g^+$ & & \\
+		$t^* \gets r^+ \xor H(s^*)$ & & \\
+		$c^* \gets f(s^* \parallel t^*)$ & $\xrightarrow{\ct^*}$ & \\
+		\\
+		\multicolumn{3}{c}{\cellcolor{gray!20}$\orc^{\dec}, \orc^{\hash}, \orc^{\gash}$ Query Phase 2} \\
+		\\
+		Return $[b' \same b]$ & $\xleftarrow{\bit'}$ & $\adv$ chooses $\bit' \in \set{0, 1}$ \\
+  \end{tabularx}
+\end{tcolorbox}
+
+이 게임에서는 위에서 정의한 두 번째 규칙을 제거하고, 무작위 오라클 $G$에 대한
+질의를 원래대로 복원한다. 따라서 $g^+$는 $x^*$를 구성할 때만 사용되고, 그 이후
+계산에는 전혀 등장하지 않는다. 이로 인해, $\adv$의 입력은 비트 $b$에 의존하지
+않는 확률 분포를 따르게 된다. 따라서 다음이 성립한다.
+$$
+	\Pr[S_2] = \frac{1}{2}.
+$$
+
+\begin{memo}
+	$g^+$는 무작위로 생성한 값으로, $s^* = (m_b \parallel 0^{k_1}) \xor g^+$를
+	계산할 때 외에는 전혀 등장하지 않는다. 원래는 $r^+$를 $G$에 질의하면 $g^+$가
+	나오는 두 번째 룰에 의해 $g^+$가 등장했었기 때문에, 공격자가 $G$에 $r^+$를
+	질의하면 정보를 얻을 수 있었으나, 이젠 얻을 수 없다. 따라서 $s^*$에 대한
+	정보, 더 나아가 $c^*$에 대한 정보를 공격자는 절대 얻을 수 없다. 그래서
+	$\adv$가 입력 $c^*$를 받더라도 이 게임의 성공확률은 정확히 $1/2$이다.
+\end{memo}
+
+$\game_1$과 $\game_2$는 $r^*$가 오라클 $G$에 질의되는 경우에 한해 서로 다를 수
+있다.
+
+\begin{memo}
+	$\game_1$에서는 $G(r^*)$가 $g^+$로 설정되어 $r^*$를 질의할 때 $g^+$를
+	응답하지만, $\game_2$에서는 $r^*$를 질의하면, 무작위 값을 응답한다. 응답한
+	무작위 값이 우연히 $g^+$일 수 있지만, 거의 다르다. $r^*$가 아닌 다른 값을
+	질의하는 경우는 두 게임에서 오라클 $G$는 동일하게 동작하지만, $r^*$가
+	질의하면 다르게 동작한다. 따라서, $r^*$가 오라클 $G$에 질의되는 경우에 한해
+	두 게임이 서로 다르게 동작할 수 있다.
+\end{memo}
+
+$\askG_2$는 $\game_2$에서 $r^*$가 공격자에 의해 오라클 $G$에 질의되는 사건이다.
+이후에서 우리는 모든 $\game_i$에 대해 동일한 표기 $\askG_i$를 사용한다.
+보조정리에 의해 다음 부등식이 성립한다.
+$$
+	|\Pr[S_2] - \Pr[S_1]| \leq \Pr[\askG_2].
+$$
+
+\begin{memo}
+	오라클 $G$에 질의하는 사건을 고려할 때, 공격자 뿐만 아니라 복호화 오라클이
+	$G$에 질의하는 것도 고려한다. 즉, $\askG_2$는 공격자 및 복호화 오라클에 의해
+	$r^*$가 $G$에 질의되는 사건을 의미한다. 복호화 오라클은 $(s, t) \gets
+	g(c)$를 계산한 뒤 $r \gets t \xor H(s)$ 및 $M \gets G(r) \xor s$를
+	계산하는데, 이 때 $r$이 $G$에 질의된다.
+\end{memo}
+
+\newpage
+\subsubsection{3 번째 게임}
+
+\begin{tcolorbox}[colback=white]
+	\centering
+	\begin{tabularx}{\linewidth}{CcC}
+		\underline{Challenger $\ch$} & $\xLeftrightarrow{\game_3}$ & \underline{Adversary $\adv$} \\
+		\\
+		$\orcl_{H}, \orcl_{G} \gets \set{}, \set{}$ & & \\
+		$r^+ \rgets \set{0, 1}^{k_0}, g^+ \rgets \set{0, 1}^{k - k_0}$ & & \\
+		\textcolor{red}{$s^+ \rgets \set{0, 1}^{k - k_0}, h^+ \rgets \set{0, 1}^{k_0}$} & & \\
+		\textcolor{red}{$\orcl_H \gets \orcl_H \cup \set{(s^+, h^+)}$} & & \\
+		$(\pk, \sk) \gets \genkey(1^{\sp})$ & $\xrightarrow{1^{\sp}, \pk}$ & \\
+		\\
+		\multicolumn{3}{c}{\cellcolor{gray!20}$\orc^{\dec}, \orc^{\hash}, \orc^{\gash}$ Query Phase 1} \\
+		\\
+		& $\xleftarrow{\msg^*_0, \msg^*_1}$ & $\adv$ chooses $\msg^*_0, \msg^*_1 \in \msgspace$ such that $|\msg^*_0| = |\msg^*_1|$ and $\msg^*_0 \neq \msg^*_1$ \\
+		\\
+		$\bit \rgets \set{0, 1}$ & & \\
+		\\
+		$s^* \gets (m_b \parallel 0^{k_0}) \xor g^+$ & & \\
+		\textcolor{red}{$t^* \gets r^+ \xor h^+$} & & \\
+		$c^* \gets f(s^* \parallel t^*)$ & $\xrightarrow{\ct^*}$ & \\
+		\\
+		\multicolumn{3}{c}{\cellcolor{gray!20}$\orc^{\dec}, \orc^{\hash}, \orc^{\gash}$ Query Phase 2} \\
+		\\
+		Return $[b' \same b]$ & $\xleftarrow{\bit'}$ & $\adv$ chooses $\bit' \in \set{0, 1}$ \\
+  \end{tabularx}
+\end{tcolorbox}
+
+이번에는 $s^+ \rgets \{0,1\}^{k - k_0}, h^+ \rgets \{0,1\}^{k_0}$를
+무작위로 선택하고, $s^*$ 대신 $s^+$, $H(s^*)$ 대신 $h^+$를 사용한다. 게임의
+규칙은 $\game_2$와 유사하다. 이 때, 다음을 만족한다.
+$$
+	\Pr[\text{AskG}_3] = \Pr[\text{AskG}_2].
+$$
+
+\begin{memo}
+	$\game_2$에서 $\game_3$로 변경하는 과정은 $\game_0$에서 $\game_1$으로
+	변경하는 과정과 유사하다. $\game_1$에서 설명한 것과 마찬가지로, $(s^*,
+	H(s^*))$와 $s^+, h^+$의 확률분포는 동일하다. 즉, 공격자는 두 게임에서
+	동일하게 동작하며, $G$에 질의하는 동작도 동일하다. 따라서,
+	$\Pr[\text{AskG}_3] = \Pr[\text{AskG}_2]$를 만족한다.
+\end{memo}
+
+\newpage
+\subsubsection{4 번째 게임}
+
+\begin{tcolorbox}[colback=white]
+	\centering
+	\begin{tabularx}{\linewidth}{CcC}
+		\underline{Challenger $\ch$} & $\xLeftrightarrow{\game_4}$ & \underline{Adversary $\adv$} \\
+		\\
+		$\orcl_{H}, \orcl_{G} \gets \set{}, \set{}$ & & \\
+		$r^+ \rgets \set{0, 1}^{k_0}, g^+ \rgets \set{0, 1}^{k - k_0}$ & & \\
+		$s^+ \rgets \set{0, 1}^{k - k_0}, h^+ \rgets \set{0, 1}^{k_0}$ & & \\
+		\textcolor{red}{\sout{$\orcl_H \gets \orcl_H \cup \set{(s^+, h^+)}$}} & & \\
+		$(\pk, \sk) \gets \genkey(1^{\sp})$ & $\xrightarrow{1^{\sp}, \pk}$ & \\
+		\\
+		\multicolumn{3}{c}{\cellcolor{gray!20}$\orc^{\dec}, \orc^{\hash}, \orc^{\gash}$ Query Phase 1} \\
+		\\
+		& $\xleftarrow{\msg^*_0, \msg^*_1}$ & $\adv$ chooses $\msg^*_0, \msg^*_1 \in \msgspace$ such that $|\msg^*_0| = |\msg^*_1|$ and $\msg^*_0 \neq \msg^*_1$ \\
+		\\
+		$\bit \rgets \set{0, 1}$ & & \\
+		\\
+		$s^* \gets (m_b \parallel 0^{k_0}) \xor g^+$ & & \\
+		$t^* \gets r^+ \xor h^+$ & & \\
+		$c^* \gets f(s^* \parallel t^*)$ & $\xrightarrow{\ct^*}$ & \\
+		\\
+		\multicolumn{3}{c}{\cellcolor{gray!20}$\orc^{\dec}, \orc^{\hash}, \orc^{\gash}$ Query Phase 2} \\
+		\\
+		Return $[b' \same b]$ & $\xleftarrow{\bit'}$ & $\adv$ chooses $\bit' \in \set{0, 1}$ \\
+  \end{tabularx}
+\end{tcolorbox}
+
+이번 게임에서는 $\game_3$의 두 번째 규칙을 제거한다. 그러면 $\game_2$와
+유사하게, 다음이 성립한다.
+$$
+	\left| \Pr[\text{AskG}_4] - \Pr[\text{AskG}_3] \right| \leq \Pr[\text{AskH}_4].
+$$
+여기서 $\askH_4$는 $\game_4$에서 공격자 또는 복호화 오라클에 의해 $s^*$가 $H$
+오라클에 질의되는 사건을 나타낸다.
+
+\begin{memo}
+	$\game_3$와 $\game_4$에서 공격자가 $H$에 $s^*$가 아닌 다른 값을 질의하면 두
+	게임에서 $H$는 동일하게 동작하지만, $s^*$를 질의하면, $\game_3$의 오라클은
+	$h^+$를, $\game_4$의 오라클은 무작위 값을 응답하기 때문에 공격자의 동작이
+	달라질 수 있다. 따라서 위 부등식을 만족한다. 이 도출 과정은 $\game_2$에서
+	부등식 도출 과정과 유사하다.
+\end{memo}
+
+\newpage
+\subsubsection{5 번째 게임}
+
+\begin{tcolorbox}[colback=white]
+	\centering
+	\begin{tabularx}{\linewidth}{CcC}
+		\underline{Challenger $\ch$} & $\xLeftrightarrow{\game_5}$ & \underline{Adversary $\adv$} \\
+		\\
+		$\orcl_{H}, \orcl_{G} \gets \set{}, \set{}$ & & \\
+		$r^+ \rgets \set{0, 1}^{k_0}, g^+ \rgets \set{0, 1}^{k - k_0}$ & & \\
+		$s^+ \rgets \set{0, 1}^{k - k_0}, h^+ \rgets \set{0, 1}^{k_0}$ & & \\
+		$(\pk, \sk) \gets \genkey(1^{\sp})$ & $\xrightarrow{1^{\sp}, \pk}$ & \\
+		\\
+		\multicolumn{3}{c}{\cellcolor{gray!20}$\orc^{\dec}, \orc^{\hash}, \orc^{\gash}$ Query Phase 1} \\
+		\\
+		& $\xleftarrow{\msg^*_0, \msg^*_1}$ & $\adv$ chooses $\msg^*_0, \msg^*_1 \in \msgspace$ such that $|\msg^*_0| = |\msg^*_1|$ and $\msg^*_0 \neq \msg^*_1$ \\
+		\\
+		$\bit \rgets \set{0, 1}$ & & \\
+		\\
+		
+		\textcolor{red}{$c^+ \rgets \set{0, 1}^k$} & \textcolor{red}{$\xrightarrow{\ct^+}$} & \\
+		\\
+		\multicolumn{3}{c}{\cellcolor{gray!20}$\orc^{\dec}, \orc^{\hash}, \orc^{\gash}$ Query Phase 2} \\
+		\\
+		Return $[b' \same b]$ & $\xleftarrow{\bit'}$ & $\adv$ chooses $\bit' \in \set{0, 1}$ \\
+  \end{tabularx}
+\end{tcolorbox}
+
+$\game_5$에서는 챌린지 암호문 $y^+ \rgets \{0,1\}^k$을 무작위로 선택하고, 단순히
+$y^\star = y^+$로 설정한다. 이 경우 다음을 만족한다.
+$$
+	\Pr[\text{AskH}_5] = \Pr[\text{AskH}_4].
+$$
+
+\begin{memo}
+	$\game_4$에서 $s^*$와 $t^*$는 $g^+$와 $h^+$에 의해 균등분포를 따른다. $f$는
+	치환이므로, $c^* = f(s^* \parallel t^*)$도 균등분포를 따른다. 따라서 $c^+$와
+	동일한 균등분포를 따르므로, 공격자는 $\game_5$에서도 동일하게 동작한다.
+	그러므로 $\Pr[\text{AskH}_5] = \Pr[\text{AskH}_4]$를 만족한다.
+\end{memo}
