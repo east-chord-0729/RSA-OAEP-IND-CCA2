@@ -22,5 +22,5 @@
 \contentsline {subsubsection}{\numberline {5.3.6}5 번째 게임}{21}{subsubsection.5.3.6}%
 \contentsline {subsubsection}{\numberline {5.3.7}6 번째 게임}{22}{subsubsection.5.3.7}%
 \contentsline {subsubsection}{\numberline {5.3.8}7 번째 게임}{23}{subsubsection.5.3.8}%
-\contentsline {subsection}{\numberline {5.4}8 번째 게임}{24}{subsection.5.4}%
+\contentsline {subsubsection}{\numberline {5.3.9}8 번째 게임}{24}{subsubsection.5.3.9}%
 \contentsline {section}{\numberline {A}보조정리}{25}{appendix.A}%

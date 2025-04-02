@@ -460,7 +460,6 @@ INPUT /usr/local/texlive/2024/texmf-dist/fonts/tfm/public/nanumtype1/nanummjbad.
 INPUT /usr/local/texlive/2024/texmf-dist/fonts/tfm/public/nanumtype1/nanummjbc1.tfm
 INPUT /usr/local/texlive/2024/texmf-dist/fonts/tfm/public/nanumtype1/nanummjbc7.tfm
 INPUT /usr/local/texlive/2024/texmf-dist/fonts/tfm/public/nanumtype1/nanummjmcf.tfm
-INPUT /usr/local/texlive/2024/texmf-dist/fonts/tfm/public/nanumtype1/nanummjbbc.tfm
 INPUT ./appendix_lemma.tex
 OUTPUT appendix_lemma.aux
 INPUT ./appendix_lemma.tex
