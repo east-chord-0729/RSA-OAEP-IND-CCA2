@@ -1,0 +1,56 @@
+\section{RSA-OAEP}
+
+다음과 같은 트랩도어 치환 $\cF$를 고려한다.
+$$
+	\cF_{\pk}: \bset^{n + \lm_1} \times \bset^{\lm_0} \to \bset^{n + \lm_1} \times \bset^{\lm_0}.
+$$
+그리고 두 해시 함수 $H, G$를 다음과 같이 준비한다.
+$$
+	H: \bset^{\lm_0} \to \bset^{\lm - \lm_0}, \quad
+	G: \bset^{\lm - \lm_0} \to \bset^{\lm_0}.
+$$
+트랩토어 치환 체계 $\Psi = (\cK, \cF, \cI)$를 포함하는 OAEP 변환
+$(\cK, \cE, \cD)$는 다음과 같이 동작한다.
+\begin{itemize}
+	\item $\cK(1^{\lm})$: $(\pk, \sk)$를 생성한다. $\pk$는 이후 트랩도어 치환
+	$\cF$에서 사용하며, $\sk$는 $\cI$에서 사용한다.
+	\item $\cE_{\pk}(m; r)$: $m \in \bset^{n}$과 $r \rgets \bset^{\lm_0}$가
+	주어졌을 때, $s, t$를 다음과 같이 계산한다.
+	$$
+		s = (m \parallel 0^{\lm_1}) \xor G(r), \quad
+		t = r \xor H(s).
+	$$
+	$s, t$를 계산하는 과정을 도식화하면 그림 \ref{fig:oaep}와 같다. 이후 암호문 $c
+	= \cF_{\pk}(s, t)$를 출력한다.
+  \item $\cD_{\sk}(c)$: $(s,t) = \cI_{\sk}(c)$을 계산한 후, $r, M$을 다음과 같이
+  계산한다.
+	$$
+    	r = t \xor H(s), \quad M = s \xor G(r).
+	$$
+  	만약 $[M]_{\lm_1} = 0^{\lm_1}$이면 $[M]^{n}$을 출력하고, 아니라면
+  	“$\textsf{Reject}$”를 출력한다. 이 때, $[M]_{\lm_1}$은 $M$의 마지막 $\lm_1$
+  	비트(LSB)를 의미하고, $[M]^{n}$은 $M$의 첫 $n$ 비트(MSB)를 의미한다.
+\end{itemize}
+
+\begin{figure}[ht]
+	\centering
+	\begin{tikzpicture}
+		\node (m0) at (0, 0) {$m \parallel 0^{\lm_1}$};
+		\node (r) at (3, 0) {$r$};
+		\node (g) at (1.5, -1) {$G$};
+		\node (h) at (1.5, -2) {$H$};
+		\node (s) at (0, -3) {$s$};
+		\node (t) at (3, -3) {$t$};
+		\node (xorh) at (0, -1) {$\xor$};
+		\node (xorg) at (3, -2) {$\xor$};
+
+		\draw[->] (r) |- (g);
+		\draw[->] (r) -- (t);
+		\draw[->] (m0) -- (s);
+		\draw[->] (m0) |- (h);
+		\draw[->] (g) -| (s);
+		\draw[->] (h) -| (t);
+	\end{tikzpicture}
+	\caption{$\cE_{\pk}(m; r)$에서 $s, t$를 계산하는 과정}
+	\label{fig:oaep}
+\end{figure}

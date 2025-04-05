@@ -1,0 +1,211 @@
+\section{보안 개념}
+
+% \subsection{$\owcpa$}
+
+% \begin{tcolorbox}[colback=white]
+% 	\centering
+% 	\begin{tabularx}{\linewidth}{CcC}
+% 		\underline{Challenger $\cC$} & $\xLeftrightarrow{\EXP^{\owcpa}_{\Pi, \lm}}$ & \underline{Adversary $\cA$} \\
+% 		\\
+% 		$(\pk, \sk) \gets \cK(1^{\lm})$ & $\xrightarrow{1^{\lm}, \pk}$ & \\
+% 		\\
+% 		$m^* \rgets \cM$ \\ $c^* \gets \cE_{\pk}(m^*)$ & $\xrightarrow{c^*}$ & \\
+% 		\\
+% 		Return $[m' \issame m^*]$ & $\xleftarrow{m'}$ & $\cA$ chooses $m' \in \cM$ \\
+%   \end{tabularx}
+% \end{tcolorbox}
+
+% \begin{align}
+% 	\begin{split}
+% 		\ADV^{\owcpa}_{\cA, \Pi}(\lm)
+% 		&= \Pr[\EXP^{\owcpa}_{\Pi, \lm}(\cA) = 1] \\
+% 		&= \underset{m^*}{\Pr}[
+% 				(\pk, \sk) \gets \cK(1^{\lm}): 
+% 				\cA(\pk, \cE_{\pk}(m^*)) = m^*].
+% 	\end{split}
+% \end{align}
+
+\subsection{OW trapdoor permutation}
+트랩도어 치환 체계(Trapdoor permutation scheme) $\Psi = (\cK, \cF, \cI)$를 다음과
+같이 정의한다.
+\begin{itemize}
+	\item $\cK(1^{\lm})$: 확률론적 키 생성 알고리즘으로, $1^{\lm}$를 입력 받아
+		$(\pk, \sk)$를 생성한다.
+	\item $\cF_{\pk}(x)$: 결정론적 알고리즘으로, $\pk$와 $x \in \bset^{\lm}$를
+	입력 받아 $y \in \bset^{\lm}$를 출력한다.
+	\item $\cI_{\sk}(y)$: 결정론적 알고리즘으로, $\sk$와 $y \in \bset^{\lm}$를
+		입력 받아 $x \in \bset^{\lm}$를 출력한다. $\cK(1^{\lm})$로 생성한 모든
+		$(\pk, \sk)$와 모든 $x \in \bset^{\lm}$에 대해, $\cI_{\sk}(\cF_{\pk}(x)) =
+		x$를 만족한다.
+\end{itemize}
+동작시간(Running time) $\tau$를 가지는 공격자 $\cA$와 트랩도어 치환 체계
+$\Psi$에 대한 일방향성(One-wayness) 실험 $\EXP^{\OW}_{\Psi, \lm}(\cA; \tau)$을
+다음과 같이 정의한다.
+\begin{tcolorbox}[colback=white]
+	\centering
+	\begin{tabularx}{\linewidth}{CcC}
+		\underline{Challenger $\cC$} & $\xLeftrightarrow{\EXP^{\OW}_{\Psi, \lm}}$ & \underline{Adversary $\cA$} \\
+		\\
+		$(\pk, \sk) \rgets \cK(1^{\lm})$ & & \\
+		\\
+		$x^* \rgets \bset^{\lm}$ \\ $y^* \gets \cF_{\pk}(x^*)$ & $\xrightarrow{1^{\lm}, \pk, y^*}$ & \\
+		\\ 
+		Return $[x' \issame x^*]$ & $\xleftarrow{x'}$ & $\cA$ chooses $x' \in \bset^{\lm}$ \\
+  \end{tabularx}
+\end{tcolorbox}
+
+$\cA$의 능력치 $\ADV^{\OW}_{\cA; \Psi}(\lm, \tau)$를 다음과 같이 정의한다.
+$$
+	\ADV^{\OW}_{\Psi, \lm}(\cA; \tau) := \Pr[\EXP^{\OW}_{\Psi, \lm}(\cA; \tau) = 1].
+$$
+% 공격자 $\cA$의 능력치가 어떤 $\negl$에 대해 다음을 만족할 때, $\Psi$가 $(\tau,
+% \negl)$-일방향성을 가진다고 한다.
+% $$
+% 	\ADV^{\OW}_{\cA, \Psi}(\lm, \tau) \le \negl.
+% $$
+
+\subsection{Partial-domain OW trapdoor permutation}
+
+트랩도어 치환 $\Psi = (\cK, \cF, \cI)$에서, $\cF_{\pk}(x):\bset^{\lm} \to
+\bset^{\lm}$를 다음과 같이 표현한다.
+$$
+	\cF_{\pk}: \bset^{n + \lm_1} \times \bset^{\lm_0} \to \bset^{n + \lm_1} \times \bset^{\lm_0}.
+$$
+이때 $\lm = n + \lm_0 + \lm_1$이다. 
+\begin{memo}
+	예를 들어, $x = s \parallel t$라고 할 때, $y \gets \cF_{\pk}(x)$ 대신 $y
+	\gets \cF_{\pk}(s \parallel t)$로 표현할 수 있다.
+\end{memo}
+동작시간 $\tau$를 가지는 공격자 $\cA$와 트랩도어 함수 체계 $\Psi$에 대한 부분
+일방향성(Partial-domain one-wayness) 실험 $\EXP^{\PDOW}_{\Psi, \lm}(\cA;
+\tau)$을 다음과 같이 정의한다.
+
+\begin{tcolorbox}[colback=white]
+	\centering
+	\begin{tabularx}{\linewidth}{CcC}
+		\underline{Challenger $\cC$} & $\xLeftrightarrow{\EXP^{\PDOW}_{\Psi, \lm}}$ & \underline{Adversary $\cA$} \\
+		\\
+		$(\pk, \sk) \rgets \cK(1^{\lm})$ & & \\
+		\\
+		$(s^*, t^*) \rgets \bset^{n + \lm_1} \times \bset^{\lm_0}$ \\ $y^* \gets \cF_{\pk}(s^*, t^*)$ & $\xrightarrow{1^{\lm}, \pk, y^*}$ & \\
+		\\
+		Return $[s' \issame s^*]$ & $\xleftarrow{s'}$ & $\cA$ chooses $s' \in \bset^{n + \lm_1}$ \\
+  \end{tabularx}
+\end{tcolorbox}
+
+공격자 $\cA$의 능력치 $\ADV^{\PDOW}_{\Psi, \lm}(\cA; \tau)$를 다음과 같이 정의한다.
+$$
+	\ADV^{\PDOW}_{\Psi, \lm}(\cA; \tau) := \Pr[\EXP^{\PDOW}_{\Psi, \lm}(\cA; \tau) = 1].
+$$
+% 동작시간 $\tau$를 가지는 공격자 $\cA$의 능력치가 어떤 $\negl$에 대해 다음을
+% 만족할 때, $\Psi$가 $(\tau, \negl)$-부분 일방향성을 가진다고 한다.
+% $$
+% 	\ADV^{\PDOW}_{\cA, \Psi}(\lm, \tau) \le \negl.
+% $$
+
+\subsection{Set partial-domain OW trapdoor permutation}
+
+동작시간 $\tau$를 가지고 $l$개의 원소를 출력하는 공격자 $\cA$와 트랩도어 함수
+체계 $\Psi$에 대한 집합 부분 일방향성(Set partial-domain one-wayness) 실험
+$\EXP^{\SPDOW}_{\Psi, \lm}(\cA; \tau, l)$을 다음과 같이 정의한다.
+\begin{tcolorbox}[colback=white]
+	\centering
+	\begin{tabularx}{\linewidth}{CcC}
+		\underline{Challenger $\cC$} & $\xLeftrightarrow{\EXP^{\SPDOW}_{\Psi, \lm}}$ & \underline{Adversary $\cA$} \\
+		\\
+		$(\pk, \sk) \rgets \cK(1^{\lm})$ & & \\
+		\\
+		$(s^*, t^*) \rgets \bset^{n + \lm_1} \times \bset^{\lm_0}$ \\ $y^* \gets \cF_{\pk}(s^*, t^*)$ & $\xrightarrow{1^{\lm}, \pk, y^*}$ & \\
+		\\
+		Return $[s^* \isin S']$ & $\xleftarrow{S'}$ & $\cA$ chooses $S' = \set{s_i \in \bset^{n + \lm_1}: 0 \le i \le l-1}$ \\
+  \end{tabularx}
+\end{tcolorbox}
+
+공격자 $\cA$의 능력치 $\ADV^{\SPDOW}_{\Psi, \lm}(\cA; \tau, l)$를 다음과 같이 정의한다.
+$$
+	\ADV^{\SPDOW}_{\Psi, \lm}(\cA; \tau, l) := \Pr[\EXP^{\SPDOW}_{\Psi, \lm}(\cA; \tau, l) = 1].
+$$
+% 동작시간 $\tau$를 가지는 공격자 $\cA$의 능력치가 어떤 $\negl$에 대해 다음을
+% 만족할 때, $\Psi$가 $(l, \tau, \negl)$-집합 부분 일방향성을 가진다고 한다.
+% $$
+% 	\ADV^{\SPDOW}_{\cA, \Psi}(\lm, \tau, l) \le \negl.
+% $$
+
+\subsection{IND security against CCA2}
+
+공개키 암호
+체계(Public-key encryption scheme) $\Pi = (\cK, \cE, \cD)$를 다음과 같이
+정의한다.
+\begin{itemize}
+	\item $\cK(1^{\lm})$: 확률론적 키 생성 알고리즘으로, $1^{\lm}$를 입력 받아
+	$(\pk, \sk)$를 생성한다.
+	\item $\cE_{\pk}(m)$: 암호화 알고리즘으로, $\pk$와 $m \in \cM$를 입력 받아 $c
+	\in \cC$를 출력한다. 확률론적 알고리즘으로, $r \rgets \coinspace$를 추가로
+	입력 받아 $\cE_{\pk}(m; r)$으로 표현할 수도 있다.
+	\item $\cD_{\sk}(c)$: 결정론적 복호화 알고리즘으로, $\sk$와 $c \in \cC$를 입력
+	받아 $m \in \cM$를 출력한다.
+\end{itemize}
+
+동작시간 $\tau$를 가지고 복호화 오라클에 $q$회 질의하는 공격자 $\cA$와 공개키
+암호 체계 $\Pi$에 대해, 선택 암호문 공격(Adaptive chosen ciphertext attack, 이하
+CCA2)에 대한 구별불가능성(Indistinguishability) 실험 $\EXP^{\INDCCA}_{\Pi,
+\lm}(\cA; \tau, q)$을 다음과 같이 정의한다.
+
+\begin{tcolorbox}[colback=white]
+	\centering
+	\begin{tabularx}{\linewidth}{CcC}
+		\underline{Challenger $\cC$} & $\xLeftrightarrow{\EXP^{\INDCCA}_{\Pi, \lm}}$ & \underline{Adversary $\cA$} \\
+		\\
+		$(\pk, \sk) \gets \cK(1^{\lm})$ & $\xrightarrow{1^{\lm}, \pk}$ & \\
+		\\
+		\multicolumn{3}{c}{\cellcolor{gray!20}$\cO^{\cD_{\sk}}$ Query Phase 1} \\
+		\\ 
+		& $\xleftarrow{m^*_0, m^*_1}$ & $\cA$ chooses $m^*_0, m^*_1 \in \cM$ such that $|m^*_0| = |m^*_1|$ and $m^*_0 \neq m^*_1$ \\
+		\\
+		$b \rgets \bset, r^* \rgets \coinspace$ \\ $c^* \gets \cE_{\pk}(m^*_{b}; r^*)$ & $\xrightarrow{c^*}$ & \\
+		\\
+		\multicolumn{3}{c}{\cellcolor{gray!20}$\cO^{\cD_{\sk}}$ Query Phase 2} \\
+		\\
+		Return $[b' \issame b]$ & $\xleftarrow{b'}$ & $\cA$ chooses $b' \in \bset$ \\
+  \end{tabularx}
+\end{tcolorbox}
+
+공격자 $\cA$의 능력치 $\ADV^{\INDCCA}_{\Pi, \lm}(\cA; \tau, q)$를 다음과 같이 정의한다.
+$$
+	\ADV^{\INDCCA}_{\Pi, \lm}(\cA; \tau, q) = 2 \cdot \Pr[\EXP^{\INDCCA}_{\Pi, \lm}(\cA; \tau, q) = 1] - 1.
+$$
+
+\subsection{IND security against CCA2 in ROM}
+
+동작시간 $\tau$를 가지고  복호화 오라클에 $q_{\cD}$회, 랜덤 오라클에
+$q_{H}$회 질의하는 공격자 $\cA$와 공개키 암호 체계 $\Pi$에 대해,
+랜덤 오라클 모델(Random oracle model)에서의 CCA2에 대한 구별불가능성 실험
+$\EXP^{\INDCCAROM}_{\Pi, \lm}(\cA; \tau, q_{\cD}, q_{H})$을 다음과
+같이 정의한다.
+
+\begin{tcolorbox}[colback=white]
+	\centering
+	\begin{tabularx}{\linewidth}{CcC}
+		\underline{Challenger $\cC$} & $\xLeftrightarrow{\EXP^{\INDCCAROM}_{\Pi, \lm}}$ & \underline{Adversary $\cA$} \\
+		\\
+		$\cO^H \rgets \hashspace$ \\ $(\pk, \sk) \gets \cK(1^{\lm})$ & $\xrightarrow{1^{\lm}, \pk}$ & \\
+		\\
+		\multicolumn{3}{c}{\cellcolor{gray!20}$\cO^{H}, \cO^{\cD_{\sk}}$ Query Phase 1} \\
+		\\
+		& $\xleftarrow{m^*_0, m^*_1}$ & $\cA$ chooses $m^*_0, m^*_1 \in \cM$ such that $|m^*_0| = |m^*_1|$ and $m^*_0 \neq m^*_1$ \\
+		\\
+		$b \rgets \bset, r^* \rgets \coinspace$ \\ $c^* \gets \cE_{\pk}(m^*_{b}; r^*)$ & $\xrightarrow{c^*}$ & \\
+		\\
+		\multicolumn{3}{c}{\cellcolor{gray!20}$\cO^{H}, \cO^{\cD_{\sk}}$ Query Phase 2} \\
+		\\
+		Return $[b' \issame b]$ & $\xleftarrow{b'}$ & $\cA$ chooses $b' \in \bset$ \\
+  \end{tabularx}
+\end{tcolorbox}
+
+공격자 $\cA$의 능력치 $\ADV^{\INDCCAROM}_{\Pi, \lm}(\cA; \tau, q_{\cD},
+q_{H})$를 다음과 같이 정의한다.
+$$
+	\ADV^{\INDCCAROM}_{\Pi, \lm}(\cA; \tau, q_{\cD},
+	q_{H}) = 2 \cdot \Pr[\EXP^{\INDCCAROM}_{\Pi, \lm}(\cA; \tau, q_{\cD},
+	q_{H}) = 1] - 1.
+$$

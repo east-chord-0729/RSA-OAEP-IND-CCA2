@@ -1,58 +1,106 @@
-\renewcommand{\sp}{\lambda}
-\newcommand{\genkey}{\mathcal{K}}
-\newcommand{\enc}{\mathcal{E}}
-\newcommand{\dec}{\mathcal{D}}
-\newcommand{\td}{\mathcal{F}}
-\newcommand{\itd}{\mathcal{I}}
-\newcommand{\sch}{\Pi}
-\newcommand{\tdsch}{\Psi}
-\newcommand{\pk}{\textsf{pk}}
-\newcommand{\sk}{\textsf{sk}}
-\newcommand{\msg}{m}
-\newcommand{\ct}{c}
-\newcommand{\adv}{\mathcal{A}}
-\newcommand{\bdv}{\mathcal{B}}
-\newcommand{\ch}{\mathcal{C}}
-\newcommand{\coin}{r}
-\newcommand{\msgspace}{\mathcal{M}}
-\newcommand{\ctspace}{\mathcal{C}}
-\newcommand{\xspace}{\mathcal{X}}
-\newcommand{\yspace}{\mathcal{Y}}
+% packages
+\usepackage{kotex}
+\usepackage[normalem]{ulem}
+\usepackage{xcolor}
+\usepackage{geometry}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\usepackage{amsmath, amssymb}
+\usepackage{amsthm}
+\usepackage{mathtools}
+\usepackage{setspace}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{tikz}
+\usepackage{tcolorbox}
+\usepackage{tabularx}
+\usepackage{colortbl}
+\usepackage{booktabs}
+\usepackage{bookmark}
+
+% document setting
+
+\geometry{
+	a4paper, 
+	left=3cm, right=3cm, top=2cm, bottom=2cm, 
+	includehead, includefoot
+}
+
+\pagestyle{fancy}
+\fancyhf{} % 기존 머리말/꼬리말 초기화
+\renewcommand{\headrulewidth}{0.4pt} % 머리말 선 두께
+\fancyhead[L]{\leftmark} % 왼쪽 머리말
+\fancyhead[R]{\rightmark} % 오른쪽 머리말
+\renewcommand{\footrulewidth}{0.4pt}
+\fancyfoot[L]{FDL}
+\fancyfoot[R]{\thepage~/~\pageref{LastPage}} % 가운데 꼬리말에 페이지 번호 추가
+
+
+\newtheorem{theorem}{정리}
+\newtheorem{lemma}{보조정리}
+\theoremstyle{definition}
+\newtheorem{memo}{메모}[section]
+
+\setstretch{1.15}
+\newcolumntype{C}{>{\centering\arraybackslash}X}
+
+% shortcut
+\newcommand{\lm}{\lambda}
+\newcommand{\cA}{\mathcal{A}}
+\newcommand{\cB}{\mathcal{B}}
+\newcommand{\cC}{\mathcal{C}}
+\newcommand{\cE}{\mathcal{E}}
+\newcommand{\cD}{\mathcal{D}}
+\newcommand{\cF}{\mathcal{F}}
+\newcommand{\cK}{\mathcal{K}}
+\newcommand{\cI}{\mathcal{I}}
+\newcommand{\cM}{\mathcal{M}}
+\newcommand{\cO}{\mathcal{O}}
+\newcommand{\cL}{\mathcal{L}}
+
 \newcommand{\coinspace}{\mathit{\Omega}}
 \newcommand{\hashspace}{\mathit{\Phi}}
-\newcommand{\bit}{b}
-\newcommand{\hash}{H}
-\newcommand{\gash}{G}
-\newcommand{\mlen}{n}
 \newcommand{\negl}{\varepsilon}
-\newcommand{\rt}{\tau}
-\newcommand{\qr}{q}
-\newcommand{\comp}[1]{T_{#1}}
-\newcommand{\bigo}{O}
-\newcommand{\orc}{\mathcal{O}}
-\newcommand{\orcl}{\mathcal{L}}
-\newcommand{\reject}{\textsf{Reject}}
-\newcommand{\foo}{f}
+\newcommand{\pe}{\mathcal{PE}}
 
-% security proof
-\newcommand{\Exp}{\textsf{Exp}}
-\newcommand{\Adv}{\textsf{Adv}}
-\newcommand{\owcpa}{\textsf{OW-CPA}}
-\newcommand{\ow}{\textsf{OW}}
-\newcommand{\owf}{\textsf{OWF}}
-\newcommand{\owpd}{\textsf{PD-OW}}
-\newcommand{\owpds}{\textsf{S-PD-OW}}
-\newcommand{\owfpd}{\textsf{OWF-PD}}
-\newcommand{\owfpds}{\textsf{OWF-PD-S}}
-\newcommand{\owcpapd}{\textsf{OW-CPA-PD}}
-\newcommand{\indcca}{\textsf{IND-CCA2}}
-\newcommand{\indccarom}{\textsf{IND-CCA2-ROM}}
+\newcommand{\pk}{\textsf{pk}}
+\newcommand{\sk}{\textsf{sk}}
+\newcommand{\EXP}{\textsf{Exp}}
+\newcommand{\ADV}{\textsf{Adv}}
+\newcommand{\OW}{\textsf{OW}}
+\newcommand{\PDOW}{\textsf{PD-OW}}
+\newcommand{\SPDOW}{\textsf{S-PD-OW}}
+\newcommand{\INDCCA}{\textsf{IND-CCA2}}
+\newcommand{\INDCCAROM}{\textsf{IND-CCA2-ROM}}
+\newcommand{\REJECT}{\textsf{Reject}}
+\newcommand{\GAME}{\textsf{GAME}}
+
+\newcommand{\prl}{\parallel}
+\newcommand{\set}[1]{\{#1\}}
+\newcommand{\Set}[1]{\left\{#1\right\}}
+\newcommand{\bset}{\{0, 1\}}
+\newcommand{\issame}{\overset{?}{=}}
+\newcommand{\isin}{\overset{?}{\in}}
+
+\newcommand{\rgets}{\xleftarrow{\$}}
+\newcommand{\xgets}[1]{\xrightarrow{#1}}
+\newcommand{\xto}[1]{\xleftarrow{#1}}
 
 % math definition
-\newcommand{\set}[1]{\{#1\}}
-\newcommand{\rgets}{\xleftarrow{\$}}
 \newcommand{\xor}{\oplus}
 \newcommand{\To}{\longrightarrow}
 \newcommand{\same}{\overset{?}{=}}
-\newcommand{\isin}{\overset{?}{\in}}
 \newcommand{\question}[1]{\textcolor{blue}{#1}}
+
+\newcommand{\askG}{\textsf{AskG}}
+\newcommand{\askH}{\textsf{AskH}}
+\newcommand{\Gbad}{\textsf{GBad}}
+\newcommand{\Dbad}{\textsf{DBad}}
+\newcommand{\Bad}{\textsf{Bad}}
+\newcommand{\Sbad}{\textsf{SBad}}
+\newcommand{\Rbad}{\textsf{RBad}}
+\newcommand{\Cbad}{\textsf{CBad}}
+\newcommand{\Fail}{\textsf{Fail}}
+\newcommand{\askR}{\textsf{AskR}}
+\newcommand{\askS}{\textsf{AskS}}
+\newcommand{\askRS}{\textsf{AskRS}}
