@@ -17,6 +17,7 @@
 \usepackage{colortbl}
 \usepackage{booktabs}
 \usepackage{bookmark}
+\usepackage[hypcap=false]{caption}
 
 % document setting
 
@@ -39,7 +40,16 @@
 \newtheorem{theorem}{정리}
 \newtheorem{lemma}{보조정리}
 \theoremstyle{definition}
-\newtheorem{memo}{메모}[section]
+
+\newenvironment{memo}{
+  \begin{quote}%
+	\small 
+  \color{gray!80}%
+  \itshape
+  \textbf{메모. }\ignorespaces
+}{
+  \end{quote}
+}
 
 \setstretch{1.15}
 \newcolumntype{C}{>{\centering\arraybackslash}X}
@@ -57,6 +67,13 @@
 \newcommand{\cM}{\mathcal{M}}
 \newcommand{\cO}{\mathcal{O}}
 \newcommand{\cL}{\mathcal{L}}
+
+\newcommand{\bF}{\mathbb{F}}
+\newcommand{\bZ}{\mathbb{Z}}
+\newcommand{\bN}{\mathbb{N}}
+\newcommand{\bQ}{\mathbb{Q}}
+\newcommand{\bR}{\mathbb{R}}
+\newcommand{\bC}{\mathbb{C}}
 
 \newcommand{\coinspace}{\mathit{\Omega}}
 \newcommand{\hashspace}{\mathit{\Phi}}
