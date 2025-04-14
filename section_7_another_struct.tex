@@ -1,0 +1,367 @@
+\section{t가 그대로 내려온다면}
+
+OAEP 변환은 다음과 같다. (박종환 교수님 구조랑 유사하게 구성하기 위해, 이전
+그림을 좌우대칭하였다. 기호까지 변경하면 헷갈릴 것 같아서, 기호는 그대로
+두었다.)
+\begin{figure}[ht]
+	\centering
+	\begin{tikzpicture}
+		\node (m0) at (3, 0) {$m \parallel 0^{\lm_1}$};
+		\node (r) at (0, 0) {$r$};
+		\node (g) at (1.5, -1) {$G$};
+		\node (h) at (1.5, -2) {$H$};
+		\node (s) at (3, -3) {$s$};
+		\node (t) at (0, -3) {$t$};
+		\node (xorh) at (3, -1) {$\xor$};
+		\node (xorg) at (0, -2) {$\xor$};
+        \node (f) at (1.5, -4) {$\cF_{\pk}$};
+        \node (c) at (1.5, -5) {$c$};
+
+		\draw[->] (r) |- (g);
+		\draw[->] (r) -- (t);
+		\draw[->] (m0) -- (s);
+		\draw[->] (m0) |- (h);
+		\draw[->] (g) -| (s);
+		\draw[->] (h) -| (t);
+        \draw[->] (t) -| (f);
+        \draw[->] (s) -| (f);
+        \draw[->] (f) -- (c);
+	\end{tikzpicture}
+	\caption{OAEP 변환 ($\cF_{\pk}$ 포함)}
+	\label{fig:oaep_rev}
+\end{figure}
+
+이번에는 $\cF_{\pk}:\bset^{\lm_0} \times \bset^{\lm - \lm_0} \to \bset^{\lm_0} \times
+\bset^{\lm - \lm_0}$를 $\cF_{\pk}:\bset^{\lm - \lm_0} \to \bset^{\lm - \lm_0}$ 이라
+생각하고, OAEP 변환을 다음과 같이 재구성한다.
+\begin{figure}[ht]
+	\centering
+	\begin{tikzpicture}
+		\node (m0) at (3, 0) {$m \parallel 0^{\lm_1}$};
+		\node (r) at (0, 0) {$r$};
+		\node (g) at (1.5, -1) {$G$};
+		\node (h) at (1.5, -2) {$H$};
+		\node (s) at (3, -3) {$s$};
+		\node (t) at (0, -3) {$t$};
+		\node (xorh) at (3, -1) {$\xor$};
+		\node (xorg) at (0, -2) {$\xor$};
+        \node (f) at (3, -4) {$\cF_{\pk}$};
+        \node (cs) at (3, -5) {$c_s$};
+        \node (ct) at (0, -5) {$c_t$};
+
+		\draw[->] (r) |- (g);
+		\draw[->] (r) -- (t);
+		\draw[->] (m0) -- (s);
+		\draw[->] (m0) |- (h);
+		\draw[->] (g) -| (s);
+		\draw[->] (h) -| (t);
+        \draw[->] (s) -- (f);
+        \draw[->] (f) -- (cs);
+        \draw[->] (t) -- (ct);
+	\end{tikzpicture}
+	\caption{OAEP 변환 ($\cF_{\pk}$ 포함)}
+	\label{fig:another_oaep}
+\end{figure}
+
+지금부터 할 것은, $\cF_{\pk}$가 $\OW$-secure할 때, 위 OAEP 변환이
+$\INDCCA$-secure를 만족함을 보이는 것이다. 5절과 동일하게 증명을 진행한다.
+
+\newpage
+\subsection{평문추출기}
+
+평문추출기 $\pe$를 다음과 같이 정의한다.
+
+\begin{tcolorbox}
+	평문 추출기 $\pe$의 입력은 다음과 같다.
+	\begin{itemize}
+		\item 무작위 오라클 $G, H$에 대한 질의 응답 쌍을 모아 놓은 두 개의
+		리스트 $\cL_G, \cL_H$.
+		\item 유효한 암호문 $c^*$.
+		\item 후보 암호문 $c$. 이때, $c \ne c^*$이다.
+	\end{itemize}
+	추출기 $\pe$의 동작 방식은 다음과 같다.
+	\begin{itemize}
+		\item 암호문 $\textcolor{red}{c = t \parallel \cF_{\pk}(s)}$가 주어지면, $\cL_G$에 있는 모든
+		$(\gamma, G_\gamma)$와 $\cL_H$에 있는 모든 $(\delta, H_\delta)$에 대해
+		다음을 계산한다. 
+		$$
+			\sigma = \delta, \quad 
+			\theta = \gamma \oplus H_\delta, \quad 
+			\mu = G_\gamma \oplus \delta.
+		$$
+		\item 그리고 다음 조건을 검사한다.
+		$$
+			\textcolor{red}{c = \theta \parallel \cF_{\pk}(\sigma)} \quad \text{and} \quad 
+			[\mu]_{\lm_1} = 0^{\lm_1}.
+		$$
+		\item 조건이 만족되면, $\pe$는 $\mu$의 앞부분, 즉 $[\mu]^n$을 평문으로
+		출력하고 종료한다. 조건을 만족하는 조합이 없다면, $\pe$는 $\REJECT$
+		메시지를 반환한다.
+	\end{itemize}
+\end{tcolorbox}
+
+\newpage
+\subsection{증명}
+\subsubsection{게임 0}
+
+\begin{tcolorbox}[colback=white]
+	\centering
+	\begin{tabularx}{\linewidth}{CcC}
+		\underline{Challenger $\cC$} & $\xLeftrightarrow{\GAME_0}$ & \underline{Adversary $\cA$} \\
+		\\
+		$\cL_G, \cL_H \gets \set{}, \set{}$ & \\
+		$(\pk, \sk) \gets \cK(1^{\lm})$ & $\xrightarrow{1^{\lm}, \pk}$ & \\
+		\\
+		\multicolumn{3}{c}{\cellcolor{gray!20}$\cO^{\cD}, \cO^{H}, \cO^{G}$ Query Phase 1} \\
+		\\
+		& $\xleftarrow{m^*_0, m^*_1}$ & $\cA$ chooses $m^*_0, m^*_1 \in \cM$ such that $|m^*_0| = |m^*_1|$ and $m^*_0 \neq m^*_1$ \\
+		\\
+		$b \rgets \bset, r^* \rgets \bset^{\lm_0}$ & & \\
+		\\
+		$s^* \gets (m_b \parallel 0^{\lm_1}) \xor G(r^*)$ & & \\
+		$t^* \gets r^* \xor H(s^*)$ & & \\
+		\textcolor{red}{$c^* \gets t^* \parallel \cF_{\pk}(s^*)$} & $\xrightarrow{c^*}$ & \\
+		\\
+		\multicolumn{3}{c}{\cellcolor{gray!20}$\cO^{\cD}, \cO^{H}, \cO^{G}$ Query Phase 2} \\
+		\\
+		Return $[b' \issame b]$ & $\xleftarrow{b'}$ & $\cA$ chooses $b' \in \bset$ \\
+  \end{tabularx}
+\end{tcolorbox}
+
+원래는 $c^* \gets \cF_{\pk}(s^* \parallel t^*)$이지만, 바꾼 구조에서는 $c^*
+\gets t^* \parallel \cF_{\pk}(s^*)$이다. $\GAME_0$는 $\INDCCA$ 게임과 동일하다.
+따라서 공격자 $\cA$의 능력치는 다음과 같다.
+$$
+    \ADV_{\Pi, \lm}^{\INDCCA}(\cA) = 2 \cdot \left| \Pr[S_0] - \frac{1}{2} \right|.
+$$
+$S_0$는 공격자가 이 게임에서 승리할 확률을 의미한다.
+
+\newpage
+\subsubsection{게임 1}
+
+\begin{tcolorbox}[colback=white]
+	\centering
+	\begin{tabularx}{\linewidth}{CcC}
+		\underline{Challenger $\cC$} & $\xLeftrightarrow{\GAME_1}$ & \underline{Adversary $\cA$} \\
+		\\
+		$\cL_H, \cL_G \gets \set{}, \set{}$ & & \\
+		\textcolor{red}{$r^+ \rgets \bset^{\lm_0}, g^+ \rgets \bset^{\lm - \lm_0}$} & & \\
+		\textcolor{red}{$\cL_G \gets \cL_G \cup \set{(r^+, g^+)}$} & & \\
+		$(\pk, \sk) \gets \cK(1^{\lm})$ & $\xrightarrow{1^{\lm}, \pk}$ & \\
+		\\
+		\multicolumn{3}{c}{\cellcolor{gray!20}$\cO^{\cD}, \cO^{H}, \cO^{G}$ Query Phase 1} \\
+		\\
+		& $\xleftarrow{m^*_0, m^*_1}$ & $\cA$ chooses $m^*_0, m^*_1 \in \cM$ such that $|m^*_0| = |m^*_1|$ and $m^*_0 \neq m^*_1$ \\
+		\\
+		$b \rgets \bset$ & & \\
+		\\
+		\textcolor{red}{$s^* \gets (m_b \parallel 0^{\lm_1}) \xor g^+$} & & \\
+		\textcolor{red}{$t^* \gets r^+ \xor H(s^*)$} & & \\
+		$c^* \gets t^* \parallel \cF_{\pk}(s^*)$ & $\xrightarrow{c^*}$ & \\
+		\\
+		\multicolumn{3}{c}{\cellcolor{gray!20}$\cO^{\cD}, \cO^{H}, \cO^{G}$ Query Phase 2} \\
+		\\
+		Return $[b' \issame b]$ & $\xleftarrow{b'}$ & $\cA$ chooses $b' \in \bset$ \\
+  \end{tabularx}
+\end{tcolorbox}
+
+$\GAME_1$에서는 $r^+, g^+$를 게임 초기에 생성하고, $(r^+, g^+)$를 $\cL_G$에
+저장한다. 그리고 $s^*, t^*$를 다음과 같이 생성한다.
+$$
+	s^* \gets (m_b \parallel 0^{\lm_1}) \xor g^+, \quad
+	t^* \gets r^+ \xor H(s^*).
+$$
+
+우리는 $(r^*, G(r^*))$와 동일한 분포를 가지는 $(r^+, g^+)$로 대체했으므로
+다음을 만족한다.
+$$
+	\Pr[S_1] = \Pr[S_0].
+$$
+
+\begin{memo}
+	$(r^+, g^+)$가 $(r^*, G(r^*))$와 동일한 분포를 가진다. 오라클 $\cO^H, \cO^G,
+	\cO^D$는 변하지 않고, 그리고 $(s^*, t^*)$의 분포가 달라지지 않는다 따라서
+	공격자 $\cA$는 이전과 동일한 전략을 사용한다.
+\end{memo}
+
+
+\newpage
+\subsubsection{게임 2}
+
+\begin{tcolorbox}[colback=white]
+	\centering
+	\begin{tabularx}{\linewidth}{CcC}
+		\underline{Challenger $\cC$} & $\xLeftrightarrow{\GAME_2}$ & \underline{Adversary $\cA$} \\
+		\\
+		$\cL_H, \cL_G \gets \set{}, \set{}$ & & \\
+		$r^+ \rgets \bset^{\lm_0}, g^+ \rgets \bset^{\lm - \lm_0}$ & & \\
+		\textcolor{red}{\sout{$\cL_G \gets \cL_G \cup \set{(r^+, g^+)}$}} & & \\
+		$(\pk, \sk) \gets \cK(1^{\lm})$ & $\xrightarrow{1^{\lm}, \pk}$ & \\
+		\\
+		\multicolumn{3}{c}{\cellcolor{gray!20}$\cO^{\cD}, \cO^{H}, \cO^{G}$ Query Phase 1} \\
+		\\
+		& $\xleftarrow{m^*_0, m^*_1}$ & $\cA$ chooses $m^*_0, m^*_1 \in \cM$ such that $|m^*_0| = |m^*_1|$ and $m^*_0 \neq m^*_1$ \\
+		\\
+		$b \rgets \bset$ & & \\
+		\\
+		$s^* \gets (m_b \parallel 0^{\lm_1}) \xor g^+$ & & \\
+		$t^* \gets r^+ \xor H(s^*)$ & & \\
+		$c^* \gets t^* \parallel \cF_{\pk}(s^*)$ & $\xrightarrow{c^*}$ & \\
+		\\
+		\multicolumn{3}{c}{\cellcolor{gray!20}$\cO^{\cD}, \cO^{H}, \cO^{G}$ Query Phase 2} \\
+		\\
+		Return $[b' \issame b]$ & $\xleftarrow{b'}$ & $\cA$ chooses $b' \in \bset$ \\
+  \end{tabularx}
+\end{tcolorbox}
+
+$\GAME_2$에서는 초기에 $(r^+, g^+)$를 무작위로 생성하지만, $\cL_G$에 저장하지는
+않는다. $r^+, g^+$는 $s^*, t^*$를 계산할 때만 사용된다. 따라서 다음을 만족한다.
+$$
+	\Pr[S_2] = \frac{1}{2}.
+$$
+\begin{memo}
+	공격자는 $r^+, g^+$에 대한 정보를 얻을 수 없으므로, $s^*, t^*$에 대한 정보도
+	얻을 수 없다. 따라서 공격자는 $c^*$에 대한 정보를 얻을 수 없어($\cF_{\pk}$는
+	순열), 승률은 $1/2$이 된다.
+\end{memo}
+
+$\GAME_1$과 $\GAME_2$에서, $r^*$가 오라클 $G$에 질의되는 경우에만 공격자 $\cA$의
+전략은 달라질 수 있다. $\askG_2$를 $\GAME_2$에서 $r^*$가 공격자에 의해 오라클
+$G$에 질의되는 사건이라 하자. (이후에서 모든 $\GAME_i$에 대해 동일한 표기
+$\askG_i$를 사용한다) 이때, 다음 부등식이 성립한다. (Appendix의 보조정리 참고)
+$$
+	|\Pr[S_2] - \Pr[S_1]| \leq \Pr[\askG_2].
+$$
+
+\begin{memo}
+	공격자가 $r^*$를 질의하지 않는 상황에서(즉, $\neg\askG_2$ 상황에서)
+	\begin{itemize}
+		\item $\GAME_1$과 $\GAME_2$에서 오라클 $G$는 동일하게 동작.
+		\item 공격자는 전략을 수정하지 않고, 게임의 승률은 변하지 않음.
+		\item 즉, $\Pr[S_2 \land \neg\askG_2] = \Pr[S_1 \land \neg\askG_2]$.
+		\item 따라서 보조정리에 의해, $|\Pr[S_2] - \Pr[S_1]| \leq \Pr[\askG_2]$.
+	\end{itemize}
+\end{memo}
+
+
+\newpage
+\subsubsection{게임 3}
+
+\begin{tcolorbox}[colback=white]
+	\centering
+	\begin{tabularx}{\linewidth}{CcC}
+		\underline{Challenger $\cC$} & $\xLeftrightarrow{\GAME_3}$ & \underline{Adversary $\cA$} \\
+		\\
+		$\cL_H, \cL_G \gets \set{}, \set{}$ & & \\
+		$r^+ \rgets \bset^{\lm_0}, g^+ \rgets \bset^{\lm - \lm_0}$ & & \\
+		\textcolor{red}{$s^+ \rgets \bset^{\lm - \lm_0}, h^+ \rgets \bset^{\lm_0}$} & & \\
+		\textcolor{red}{$\cL_H \gets \cL_H \cup \set{(s^+, h^+)}$} & & \\
+		$(\pk, \sk) \gets \cK(1^{\lm})$ & $\xrightarrow{1^{\lm}, \pk}$ & \\
+		\\
+		\multicolumn{3}{c}{\cellcolor{gray!20}$\cO^{\cD}, \cO^{H}, \cO^{G}$ Query Phase 1} \\
+		\\
+		& $\xleftarrow{m^*_0, m^*_1}$ & $\cA$ chooses $m^*_0, m^*_1 \in \cM$ such that $|m^*_0| = |m^*_1|$ and $m^*_0 \neq m^*_1$ \\
+		\\
+		$b \rgets \bset$ & & \\
+		\\
+		\textcolor{red}{\sout{$s^* \gets (m_b \parallel 0^{\lm_1}) \xor g^+$}} & & \\
+		\textcolor{red}{$t^* \gets r^+ \xor h^+$} & & \\
+		\textcolor{red}{$c^* \gets t^* \parallel \cF_{\pk}(s^+)$} & $\xrightarrow{c^*}$ & \\
+		\\
+		\multicolumn{3}{c}{\cellcolor{gray!20}$\cO^{\cD}, \cO^{H}, \cO^{G}$ Query Phase 2} \\
+		\\
+		Return $[b' \issame b]$ & $\xleftarrow{b'}$ & $\cA$ chooses $b' \in \bset$ \\
+  \end{tabularx}
+\end{tcolorbox}
+
+$\GAME_3$에서는 $(s^*, H(s^*))$ 대신 $s^+, h^+$를 게임 초기에 무작위로 선택하여
+$\cL_H$에 저장하고, $(s^+, h^+)$를 사용한다. 이때 다음을 만족한다.
+($\GAME_0$에서 $\GAME_1$으로의 변경과 유사하므로 설명은 생략.)
+$$
+	\Pr[\askG_3] = \Pr[\askG_2].
+$$
+
+\newpage
+\subsubsection{게임 4}
+
+\begin{tcolorbox}[colback=white]
+	\centering
+	\begin{tabularx}{\linewidth}{CcC}
+		\underline{Challenger $\cC$} & $\xLeftrightarrow{\GAME_4}$ & \underline{Adversary $\cA$} \\
+		\\
+		$\cL_H, \cL_G \gets \set{}, \set{}$ & & \\
+		$r^+ \rgets \bset^{\lm_0}, g^+ \rgets \bset^{\lm - \lm_0}$ & & \\
+		$s^+ \rgets \bset^{\lm - \lm_0}, h^+ \rgets \bset^{\lm_0}$ & & \\
+		\textcolor{red}{\sout{$\cL_H \gets \cL_H \cup \set{(s^+, h^+)}$}} & & \\
+		$(\pk, \sk) \gets \cK(1^{\lm})$ & $\xrightarrow{1^{\lm}, \pk}$ & \\
+		\\
+		\multicolumn{3}{c}{\cellcolor{gray!20}$\cO^{\cD}, \cO^{H}, \cO^{G}$ Query Phase 1} \\
+		\\
+		& $\xleftarrow{m^*_0, m^*_1}$ & $\cA$ chooses $m^*_0, m^*_1 \in \cM$ such that $|m^*_0| = |m^*_1|$ and $m^*_0 \neq m^*_1$ \\
+		\\
+		$b \rgets \bset$ & & \\
+		\\
+		$t^* \gets r^+ \xor h^+$ & & \\
+		$c^* \gets t^* \parallel \cF_{\pk}(s^+)$ & & \\
+		\\
+		\multicolumn{3}{c}{\cellcolor{gray!20}$\cO^{\cD}, \cO^{H}, \cO^{G}$ Query Phase 2} \\
+		\\
+		Return $[b' \issame b]$ & $\xleftarrow{b'}$ & $\cA$ chooses $b' \in \bset$ \\
+  \end{tabularx}
+\end{tcolorbox}
+
+$\GAME_4$에서는 초기에 생성한 $(s^+, h^+)$를 $\cL_H$에 저장하는 과정을 생략한다.
+이때 다음이 성립한다.
+$$
+	\left| \Pr[\askG_4] - \Pr[\askG_3] \right| \leq \Pr[\askH_4].
+$$
+여기서 $\askH_4$는 $\GAME_4$에서 공격자 또는 복호화 오라클에 의해 $s^*$가 $H$
+오라클에 질의되는 사건을 나타낸다.
+
+\begin{memo}
+	공격자가 $s^*$를 질의하지 않는 상황에서(즉, $\neg\askH_4$ 상황에서)
+	\begin{itemize}
+		\item $\GAME_3$과 $\GAME_4$에서 오라클 $H$는 동일하게 동작.
+		\item 공격자는 전략을 수정하지 않음.
+		\item 즉, $\Pr[\askG_4 \land \neg\askH_4] = \Pr[\askG_3 \land \neg\askH_4]$.
+		\item 따라서 보조정리에 의해, $\left| \Pr[\askG_4] - \Pr[\askG_3] \right| \leq \Pr[\askH_4]$.
+	\end{itemize}
+\end{memo}
+
+\newpage
+\subsubsection{게임 5}
+
+\begin{tcolorbox}[colback=white]
+	\centering
+	\begin{tabularx}{\linewidth}{CcC}
+		\underline{Challenger $\cC$} & $\xLeftrightarrow{\GAME_5}$ & \underline{Adversary $\cA$} \\
+		\\
+		$\cL_H, \cL_G \gets \set{}, \set{}$ & & \\
+		\textcolor{red}{\sout{$r^+ \rgets \bset^{\lm_0}, g^+ \rgets \bset^{\lm - \lm_0}$}} & & \\
+		\textcolor{red}{\sout{$s^+ \rgets \bset^{\lm - \lm_0}, h^+ \rgets \bset^{\lm_0}$}} & & \\
+		$(\pk, \sk) \gets \cK(1^{\lm})$ & $\xrightarrow{1^{\lm}, \pk}$ & \\
+		\\
+		\multicolumn{3}{c}{\cellcolor{gray!20}$\cO^{\cD}, \cO^{H}, \cO^{G}$ Query Phase 1} \\
+		\\
+		& $\xleftarrow{m^*_0, m^*_1}$ & $\cA$ chooses $m^*_0, m^*_1 \in \cM$ such that $|m^*_0| = |m^*_1|$ and $m^*_0 \neq m^*_1$ \\
+		\\
+		$b \rgets \bset$ & & \\
+		\\
+		\textcolor{red}{$c^+ \rgets \bset^{\lm}$} & \textcolor{red}{$\xrightarrow{c^+}$} & \\
+		\\
+		\multicolumn{3}{c}{\cellcolor{gray!20}$\cO^{\cD}, \cO^{H}, \cO^{G}$ Query Phase 2} \\
+		\\
+		Return $[b' \issame b]$ & $\xleftarrow{b'}$ & $\cA$ chooses $b' \in \bset$ \\
+  \end{tabularx}
+\end{tcolorbox}
+$\GAME_5$에서는 도전 암호문 $c^+$을 무작위로 선택하여 전달한다. 이때 다음을
+만족한다.
+$$
+	\Pr[\askH_5] = \Pr[\askH_4].
+$$
+
+\begin{memo}
+	$\GAME_4$에서 $s^*$와 $t^*$는 균등분포이고, $\cF_{\pk}$는 순열이므로,
+	$c^*$는 균등분포를 따른다. (맞나?) $c^+$와 $c^*$는 동일한 분포를 따르므로, 공격자는
+	동일한 전략을 사용한다.
+\end{memo}
