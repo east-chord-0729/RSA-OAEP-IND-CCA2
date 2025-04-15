@@ -101,7 +101,7 @@ $\INDCCA$-secure를 만족함을 보이는 것이다. 5절과 동일하게 증�
 \end{tcolorbox}
 
 \newpage
-\subsection{증명}
+\subsection{게임 변환}
 \subsubsection{게임 0}
 
 \begin{tcolorbox}[colback=white]
@@ -302,7 +302,7 @@ $$
 		$b \rgets \bset$ & & \\
 		\\
 		$t^* \gets r^+ \xor h^+$ & & \\
-		$c^* \gets t^* \parallel \cF_{\pk}(s^+)$ & & \\
+		$c^* \gets t^* \parallel \cF_{\pk}(s^+)$ & $\xrightarrow{c^*}$ & \\
 		\\
 		\multicolumn{3}{c}{\cellcolor{gray!20}$\cO^{\cD}, \cO^{H}, \cO^{G}$ Query Phase 2} \\
 		\\
@@ -347,21 +347,233 @@ $$
 		\\
 		$b \rgets \bset$ & & \\
 		\\
-		\textcolor{red}{$c^+ \rgets \bset^{\lm}$} & \textcolor{red}{$\xrightarrow{c^+}$} & \\
+		\textcolor{red}{$c_t^+ \rgets \bset^{\lm_0}$, $c_s^+ \rgets \bset^{\lm - \lm_0}$} & & \\
+		\textcolor{red}{$c^+ \gets c_t^+ \parallel c_s^+$} & \textcolor{red}{$\xrightarrow{c^+}$} & \\
 		\\
 		\multicolumn{3}{c}{\cellcolor{gray!20}$\cO^{\cD}, \cO^{H}, \cO^{G}$ Query Phase 2} \\
 		\\
 		Return $[b' \issame b]$ & $\xleftarrow{b'}$ & $\cA$ chooses $b' \in \bset$ \\
   \end{tabularx}
 \end{tcolorbox}
-$\GAME_5$에서는 도전 암호문 $c^+$을 무작위로 선택하여 전달한다. 이때 다음을
-만족한다.
+$\GAME_5$에서는 도전 암호문 $c_t^+$와 $c_s^+$을 무작위로 선택하고, $c^+ = c_t^+
+\parallel c_s^+$를 전달한다. 이때 다음을 만족한다.
 $$
 	\Pr[\askH_5] = \Pr[\askH_4].
 $$
 
 \begin{memo}
 	$\GAME_4$에서 $s^*$와 $t^*$는 균등분포이고, $\cF_{\pk}$는 순열이므로,
-	$c^*$는 균등분포를 따른다. (맞나?) $c^+$와 $c^*$는 동일한 분포를 따르므로, 공격자는
+	$c^*$는 균등분포를 따른다. $c^+$와 $c^*$는 동일한 분포를 따르므로, 공격자는
 	동일한 전략을 사용한다.
 \end{memo}
+
+\newpage
+\subsubsection{게임 6}
+
+$\GAME_5$에서 복호화 오라클 $\cD$는 질의한 암호문 $c = c_t \parallel c_s$에 대해 다음과 같이 동작한다.
+\begin{tcolorbox}
+	\begin{itemize}
+		\item $s = \cI_{\sk}(c_s)$을 계산한 후, $r = c_t \xor H(s), M = s
+		\xor G(r)$을 계산한다.
+		\item 만약 $[M]_{\lm_1} = 0^{\lm_1}$이면 $[M]^{n}$을 출력하고,
+		아니라면 “$\REJECT$”를 출력한다.
+	\end{itemize}
+\end{tcolorbox}
+
+$\GAME_6$에서는 복호화 오라클이 $c$에 대응하는 $r$ 값이 공격자에 의해 이전에 $G$
+오라클에 질의되지 않았을 때, $\REJECT$를 반환하게 만든다. 이렇게 바꾼 복호화
+오라클은 다음과 같이 동작한다.
+
+\begin{tcolorbox}
+	\begin{itemize}
+		\item $s = \cI_{\sk}(c_s)$을 계산한 후, $r = c_t \xor H(s)$을 계산한다.
+		\item $r$이 $G$에 질의되지 않았다면, “$\REJECT$”를 출력한다.
+		\item $M = s \xor G_r$을 계산한다.
+		\item 만약 $[M]_{\lm_1} = 0^{\lm_1}$이면 $[M]^{n}$을 출력하고,
+		아니라면 “$\REJECT$”를 출력한다.
+	\end{itemize}
+\end{tcolorbox}
+
+\begin{memo}
+	$r$이 $G$에 질의되지 않았다는 것은 $(r, G_r) \notin \cL_G$를 의미한다.
+	따라서 두 번째 단계를 넘어가면, $(r, G_r) \in \cL_G$이므로, $M = s \xor
+	G_r$를 계산할 수 있다. 이때, $r$을 $G$에 질의하지 않고, $G_r$을 꺼내와서
+	사용한다.
+\end{memo}
+
+이는 $c$가 유효한 암호문인데도 $r$이 $G$에 질의되지 않은 경우에만 차이를
+발생시킨다. $G(r)$이 균등분포를 따르므로, 다음과 같은 등식이 성립할 확률은
+다음과 같다.
+$$
+	\Pr[[s \oplus G(r)]_{\lm_1} = 0^{\lm_1}] = \frac{1}{2^{\lm_1}}.
+$$
+모든 복호화 질의를 고려하면, 다음 부등식을 얻는다.
+$$	
+	\left| \Pr[\askH_6] - \Pr[\askH_5] \right| \leq \frac{q_D}{2^{\lm_1}}.
+$$
+
+\begin{memo}
+	복호화 오라클이 유효한 암호문 $c$를 입력받을 때, 
+	\begin{itemize}
+		\item $\GAME_5$에서
+			\begin{itemize}
+				\item $r$이 $G$에 질의되었다. $\implies$ $[M]_{\lm_1} \neq 0^{\lm_1}$이면 $\REJECT$.
+				\item $r$이 $G$에 질의되지 않았다. $\implies$ $[M]_{\lm_1} \neq 0^{\lm_1}$이면 $\REJECT$.
+			\end{itemize}
+		\item $\GAME_6$에서
+		\begin{itemize}
+			\item $r$이 $G$에 질의되었다. $\implies$ $[M]_{\lm_1} \neq 0^{\lm_1}$이면 $\REJECT$.
+			\item $r$이 $G$에 질의되지 않았다. $\implies$ $\REJECT$.
+		\end{itemize}
+	\end{itemize}
+	즉, $r$이 $G$에 질의되지 않은 상황에서, $[M]_{\lm_1} = 0^{\lm_1}$인 사건이
+	발생하면 $\GAME_5$와 $\GAME_6$의 복호화 오라클 응답이 달라질 수 있다. 즉,
+	Bad 사건은 ``$q_D$번의 복호화 오라클 질의동안 $[M]_{\lm_1} = 0^{\lm_1}$인
+	경우가 발생하는 사건''이다.
+\end{memo}
+
+\newpage
+\subsubsection{게임 7}
+
+$\GAME_7$에서는 복호화 오라클이 $c = c_t \parallel c_s$에 대응하는 $s$ 값이
+공격자에 의해 이전에 오라클 $H$에 질의되지 않은 경우 $\REJECT$를 반환하게
+만든다. 
+
+\begin{tcolorbox}
+	\begin{itemize}
+		\item $s = \cI_{\sk}(c_s)$을 계산한다.
+		\item $s$가 $H$에 질의되지 않았다면, $\REJECT$를 반환한다.
+		\item $r = c_t \xor H_s$을 계산한다.
+		\item $r$이 $G$에 질의되지 않았다면, “$\REJECT$”를 출력한다.
+		\item $M = s \xor G_r$을 계산한다.
+		\item 만약 $[M]_{\lm_1} = 0^{\lm_1}$이면 $[M]^{n}$을 출력하고,
+		아니라면 “$\REJECT$”를 출력한다.
+	\end{itemize}
+\end{tcolorbox}
+
+이 변경은 $c$가 유효한 암호문이고, $r$은 오라클 $G$에 이미 질의된 반면, $s$는
+여전히 $H$에 질의되지 않았을 경우에만 차이를 발생시킨다. $r = c_t \xor H_s$는
+균등 분포를 따르므로, $r$이 $G$에 질의되었을 확률은 $q_G / 2^{\lm_0}$보다 작다.
+이전 게임에서는 복호화 오라클이 $G$에 추가 질의를 하지 않는다는 점에 유의한다.
+모든 복호화 질의를 고려하면 다음 부등식을 얻는다.
+$$
+	\left| \Pr[\askH_7] - \Pr[\askH_6] \right| \leq \frac{q_D q_G}{2^{\lm_0}}.
+$$
+
+\begin{memo}
+	복호화 오라클이 유효한 암호문 $c$를 입력받을 때, 
+	\begin{itemize}
+		\item $\GAME_6$에서,
+			\begin{itemize}
+				\item $r$이 $G$에 질의되지 않았다. $\implies$ $\REJECT$.
+				\item $r$이 $G$에 질의되었고, $s$가 $H$에 질의되었다. $\implies$ $[M]_{\lm_1} \neq 0^{\lm_1}$이면 $\REJECT$.
+				\item $r$이 $G$에 질의되었고, $s$가 $H$에 질의되지 않았다. $\implies$ $[M]_{\lm_1} \neq 0^{\lm_1}$이면 $\REJECT$.
+			\end{itemize}
+		\item $\GAME_7$에서,
+		\begin{itemize}
+			\item $r$이 $G$에 질의되지 않았다. $\implies$ $\REJECT$.
+			\item $r$이 $G$에 질의되었고, $s$가 $H$에 질의되었다. $\implies$ $[M]_{\lm_1} \neq 0^{\lm_1}$이면 $\REJECT$.
+			\item $r$이 $G$에 질의되었고, $s$가 $H$에 질의되지 않았다. $\implies$ $\REJECT$.
+		\end{itemize}
+	\end{itemize}
+	즉, $r$이 $G$에 질의되었고, $s$이 $H$에 질의되지 않은 상황에서, $[M]_{\lm_1}
+	= 0^{\lm_1}$인 사건이 발생하면 $\GAME_6$와 $\GAME_7$의 복호화 오라클 응답이
+	달라질 수 있다. 즉, Bad 사건은 ``$q_D$번의 복호화 오라클 질의하는 동안,
+	$r$이 $G$에 질의되지 않으면서 $[M]_{\lm_1} = 0^{\lm_1}$인 경우가 발생하는
+	사건''이다.
+\end{memo}
+
+
+\newpage
+\subsubsection{게임 8}
+
+$\GAME_8$에서는 복호화 오라클을 평문 추출기로 완전히 대체한다. 평문 추출기는
+$\GAME_7$의 복호화 오라클을 완벽히 시뮬레이션할 수 있다. 따라서, 다음을
+만족한다.
+$$
+	\Pr[\askH_8] = \Pr[\askH_7].
+$$
+
+\begin{memo}
+	평문 추출기 $\pe$가 유효한 암호문 $c$를 입력받을 때,
+	\begin{itemize}
+		\item $r$이 $G$에 질의되지 않았거나, $s$가 $H$에 질의되지 않았다. \\
+		$\implies$ $c = \theta \parallel \cF_{\pk}(\sigma)$가 성립하지 않으므로, $\REJECT$를 반환한다.
+		\item $r$이 $G$에 질의되었고, $s$가 $H$에 질의되었다. \\
+		$\implies$ $[M]_{\lm_1} \neq 0^{\lm_1}$이면 $\REJECT$를 반환한다.
+	\end{itemize}
+	이는 평문 추출기가 $\GAME_7$의 복호화 오라클과 동일한 출력을 반환함을
+	의미하고, 평문 추출기가 복호화 오라클을 완벽히 시뮬레이션 할 수 있음을
+	의미한다.
+\end{memo}
+
+\newpage
+\subsection{리덕션}
+
+다음과 같이 실험을 구성한다.
+
+% \begin{tcolorbox}[colback=white]
+% 	\centering
+% 	\begin{tabularx}{\linewidth}{CcCcC}
+% 		\underline{Challenger $\cC$} & $\xLeftrightarrow{\EXP^{\SPDOW}_{\Psi, \lm}}$ & \underline{Adversary $\cB$} & $\xLeftrightarrow{\GAME_8}$ & \underline{Adversary $\cA$} \\
+% 		\\
+% 		$(\pk, \sk) \gets \cK(1^{\lm})$ & & & & \\
+% 		\\
+%     	$s^* \rgets \bset^{\lm - \lm_0}$ & & & & \\
+% 		$t^* \rgets \bset^{\lm_0}$ & & & & \\
+%     	$c^* \gets t^* \parallel \cF_{\pk}(s^*)$ & $\xrightarrow{1^{\lm}, \pk, c^*}$ & & & \\
+% 		\\
+% 		 & & $\cL_{H}, \cL_{G} \gets \set{}, \set{}$ & $\xrightarrow{1^{\lm}, \pk}$ & \\
+% 		\\
+% 		 & & \multicolumn{3}{c}{\cellcolor{gray!20}$\pe, \cO^{H}, \cO^{G}$ Query Phase 1} \\
+% 		\\
+% 		& & & $\xleftarrow{m^*_0, m^*_1}$ & $\cA$ chooses $m^*_0, m^*_1 \in \cM$ such that $|m^*_0| = |m^*_1|$ and $m^*_0 \neq m^*_1$ \\
+% 		\\
+% 		 & & $b \rgets \bset$ & $\xrightarrow{c^*}$ & \\
+% 		\\
+% 		 & & \multicolumn{3}{c}{\cellcolor{gray!20}$\pe, \cO^{H}, \cO^{G}$ Query Phase 2} \\
+% 		\\
+% 		Return $[s^* \isin S]$ & $\xleftarrow{S}$ & $S \gets
+% 		\set{\delta \mid (\delta, H_{\delta}) \in \cL_H}$ & $\xleftarrow{b'}$ & $\cA$ chooses $b' \in \bset$ \\
+%   \end{tabularx}
+% \end{tcolorbox}
+
+\begin{tcolorbox}[colback=white]
+	\centering
+	\begin{tabularx}{\linewidth}{CcCcC}
+		\underline{Challenger $\cC$} & \textcolor{blue}{$\xLeftrightarrow{\EXP^{?}_{\Psi, \lm}}$} & \underline{Adversary $\cB$} & $\xLeftrightarrow{\GAME_8}$ & \underline{Adversary $\cA$} \\
+		\\
+		$(\pk, \sk) \gets \cK(1^{\lm})$ & & & & \\
+		\\
+    	$s^* \rgets \bset^{\lm - \lm_0}$ & & & & \\
+    	$c_s^* \gets \cF_{\pk}(s^*)$ & $\xrightarrow{1^{\lm}, \pk, c_s^*}$ & & & \\
+		\\
+		& & $\cL_{H}, \cL_{G} \gets \set{}, \set{}$ & $\xrightarrow{1^{\lm}, \pk}$ & \\
+		\\
+		 & & \multicolumn{3}{c}{\cellcolor{gray!20}$\pe, \cO^{H}, \cO^{G}$ Query Phase 1} \\
+		\\
+		& & & $\xleftarrow{m^*_0, m^*_1}$ & $\cA$ chooses $m^*_0, m^*_1 \in \bset^n$ such that $|m^*_0| = |m^*_1|$ and $m^*_0 \neq m^*_1$ \\
+		\\
+		 & & $b \rgets \bset$ & & \\
+		 & & $c_t^* \rgets \bset^{\lm_0}$ & & \\
+		 & & $c^* \gets c_t^* \parallel c_s^*$ & $\xrightarrow{c^*}$ & \\
+		\\
+		 & & \multicolumn{3}{c}{\cellcolor{gray!20}$\pe, \cO^{H}, \cO^{G}$ Query Phase 2} \\
+		\\
+		Return $[s^* \isin S]$ & $\xleftarrow{S}$ & $S \gets
+		\set{\delta \mid (\delta, H_{\delta}) \in \cL_H}$ & $\xleftarrow{b'}$ & $\cA$ chooses $b' \in \bset$ \\
+  \end{tabularx}
+\end{tcolorbox}
+
+이 실험은 다음을 만족하는 공격자 $\cB$가 존재함을 보장한다.
+$$
+	\Pr[\askH_8] \leq \ADV^{?}_{\Psi, \lm}(\cB; \tau', q_{H}).
+$$
+
+따라서, 다음이 성립한다. (유도과정은 이전과 비슷하므로 생략한다)
+$$
+	\frac{1}{2} \cdot \ADV^{\INDCCA}_{\Pi, \lm}(\cA; \tau, q_{\cD}, q_{H}, q_{G}) 
+	\leq \ADV^{?}_{\Psi, \lm}(\cB; \tau', q_{H}) 
+	+ \frac{q_G + q_D + q_D q_G}{2^{\lm_0}} 
+	+ \frac{q_D}{2^{\lm_1}}.
+$$

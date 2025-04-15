@@ -22,17 +22,21 @@
 \contentsline {subsubsection}{\numberline {5.3.6}5 번째 게임}{22}{subsubsection.5.3.6}%
 \contentsline {subsubsection}{\numberline {5.3.7}6 번째 게임}{23}{subsubsection.5.3.7}%
 \contentsline {subsubsection}{\numberline {5.3.8}7 번째 게임}{24}{subsubsection.5.3.8}%
-\contentsline {subsubsection}{\numberline {5.3.9}8 번째 게임}{26}{subsubsection.5.3.9}%
-\contentsline {section}{\numberline {6}박종환 교수님 발표자료 검토}{29}{section.6}%
-\contentsline {subsection}{\numberline {6.1}Structure}{29}{subsection.6.1}%
-\contentsline {subsection}{\numberline {6.2}Questions}{29}{subsection.6.2}%
-\contentsline {section}{\numberline {7}t가 그대로 내려온다면}{30}{section.7}%
-\contentsline {subsection}{\numberline {7.1}평문추출기}{31}{subsection.7.1}%
-\contentsline {subsection}{\numberline {7.2}증명}{32}{subsection.7.2}%
-\contentsline {subsubsection}{\numberline {7.2.1}게임 0}{32}{subsubsection.7.2.1}%
-\contentsline {subsubsection}{\numberline {7.2.2}게임 1}{33}{subsubsection.7.2.2}%
-\contentsline {subsubsection}{\numberline {7.2.3}게임 2}{34}{subsubsection.7.2.3}%
-\contentsline {subsubsection}{\numberline {7.2.4}게임 3}{35}{subsubsection.7.2.4}%
-\contentsline {subsubsection}{\numberline {7.2.5}게임 4}{36}{subsubsection.7.2.5}%
-\contentsline {subsubsection}{\numberline {7.2.6}게임 5}{37}{subsubsection.7.2.6}%
-\contentsline {section}{\numberline {A}보조정리}{38}{appendix.A}%
+\contentsline {subsubsection}{\numberline {5.3.9}8 번째 게임}{25}{subsubsection.5.3.9}%
+\contentsline {section}{\numberline {6}박종환 교수님 발표자료 검토}{28}{section.6}%
+\contentsline {subsection}{\numberline {6.1}Structure}{28}{subsection.6.1}%
+\contentsline {subsection}{\numberline {6.2}Questions}{28}{subsection.6.2}%
+\contentsline {section}{\numberline {7}t가 그대로 내려온다면}{29}{section.7}%
+\contentsline {subsection}{\numberline {7.1}평문추출기}{30}{subsection.7.1}%
+\contentsline {subsection}{\numberline {7.2}게임 변환}{31}{subsection.7.2}%
+\contentsline {subsubsection}{\numberline {7.2.1}게임 0}{31}{subsubsection.7.2.1}%
+\contentsline {subsubsection}{\numberline {7.2.2}게임 1}{32}{subsubsection.7.2.2}%
+\contentsline {subsubsection}{\numberline {7.2.3}게임 2}{33}{subsubsection.7.2.3}%
+\contentsline {subsubsection}{\numberline {7.2.4}게임 3}{34}{subsubsection.7.2.4}%
+\contentsline {subsubsection}{\numberline {7.2.5}게임 4}{35}{subsubsection.7.2.5}%
+\contentsline {subsubsection}{\numberline {7.2.6}게임 5}{36}{subsubsection.7.2.6}%
+\contentsline {subsubsection}{\numberline {7.2.7}게임 6}{37}{subsubsection.7.2.7}%
+\contentsline {subsubsection}{\numberline {7.2.8}게임 7}{38}{subsubsection.7.2.8}%
+\contentsline {subsubsection}{\numberline {7.2.9}게임 8}{39}{subsubsection.7.2.9}%
+\contentsline {subsection}{\numberline {7.3}리덕션}{40}{subsection.7.3}%
+\contentsline {section}{\numberline {A}보조정리}{41}{appendix.A}%
