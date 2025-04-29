@@ -39,4 +39,6 @@
 \contentsline {subsubsection}{\numberline {7.2.8}게임 7}{38}{subsubsection.7.2.8}%
 \contentsline {subsubsection}{\numberline {7.2.9}게임 8}{39}{subsubsection.7.2.9}%
 \contentsline {subsection}{\numberline {7.3}리덕션}{40}{subsection.7.3}%
-\contentsline {section}{\numberline {A}보조정리}{41}{appendix.A}%
+\contentsline {section}{\numberline {8}??}{41}{section.8}%
+\contentsline {subsection}{\numberline {8.1}Random Self-Reducibility}{41}{subsection.8.1}%
+\contentsline {section}{\numberline {A}보조정리}{43}{appendix.A}%

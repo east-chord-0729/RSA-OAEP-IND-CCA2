@@ -18,6 +18,7 @@
 \usepackage{booktabs}
 \usepackage{bookmark}
 \usepackage[hypcap=false]{caption}
+\usepackage{etoolbox}
 
 % document setting
 
@@ -53,6 +54,8 @@
 
 \setstretch{1.15}
 \newcolumntype{C}{>{\centering\arraybackslash}X}
+
+\AtBeginEnvironment{quote}{\itshape}
 
 % shortcut
 \newcommand{\lm}{\lambda}
