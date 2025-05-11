@@ -1,3 +1,8 @@
 *.aux
 .DS_Store
 *.synctex.gz
+*.fdb_latexmk
+*.log
+*.synctex.gz
+*.fls
+*.toc
