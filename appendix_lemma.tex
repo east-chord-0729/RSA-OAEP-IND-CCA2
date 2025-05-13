@@ -1,6 +1,8 @@
 \section{보조정리}
 
-\begin{tcolorbox}[colback=white]
+\subsection{Lemma A}
+
+\begin{tcolorbox}[colback=white, sharp corners, boxrule=0.7pt]
     \begin{lemma}
         $E_1$, $E_2$, $F_1$, $F_2$를 하나의 확률 공간 상에 정의된 사건들이라고
         하자. 만약
@@ -51,3 +53,105 @@
     이라고 할 때, 두 게임이 Bad 사건 외에서는 동일하게 동작하면, 두 게임의 성공
     확률 차이는 Bad 사건의 확률 이하로 상한된다. 즉, $|\Pr[S_1] - \Pr[S_2]| \leq \varepsilon$이다.
 \end{memo}
+
+\subsection{Lemma B}
+
+증명은 지금 이해하기에는 너무 어려우니, 결과만 알도록 하자.
+
+\begin{tcolorbox}[colback=white, sharp corners, boxrule=0.7pt]
+    \begin{lemma}
+        다음과 같은 방정식을 고려하자.
+        $$
+            t + \alpha u \equiv c \pmod{N}.
+        $$
+        이 방정식은 $t$와 $u$에 대해 해를 가지며, 이때 $t$와 $u$는 모두
+        $2^{k_0}$보다 작은 값을 가진다고 하자.
+
+        $\alpha \in {0, \dots, N-1}$인 모든 값들에 대해, $\frac{2^{2k_0 +
+        6}}{N}$의 비율을 제외하고는, $(t, u)$는 유일하게 결정되며, 그 해는
+        $O((\log N)^3)$ 시간 내에 계산될 수 있다.
+    \end{lemma}
+    \label{lem:small-solution}
+\end{tcolorbox}
+
+\begin{proof}
+    다음과 같은 격자 $L(\alpha)$를 고려한다.
+    $$
+        L(\alpha) = \{(x, y) \in \mathbb{Z}^2 \mid x - \alpha y \equiv 0 \pmod{N} \}.
+    $$
+    우리는 $L(\alpha)$가 $\ell$-good 격자(그리고 $\alpha$가 $\ell$-good 값)라고
+    부른다. 그 의미는 $L(\alpha)$ 안에 유클리드 노름 기준으로 길이가 $\ell$
+    이하인 $0$이 아닌 벡터가 존재하지 않을 경우이다. 그렇지 않은 경우에는
+    $\ell$-bad 격자(그리고 $\ell$-bad 값)라고 부른다.$\ell$-bad 격자의 수는 대략
+    $\pi \ell^2$보다 작으며, 우리는 이를 $4\ell^2$로 상계한다. 실제로,
+    $\alpha$에 대한 각 bad 값은 반지름 $\ell$인 원판 안의 정수 좌표 점에
+    대응된다. 또한, 위 격자들은 서로 교차하는 지점이 $(0, 0)$ 하나뿐인데, 이는
+    $\ell < p$일 때 성립하며, 여기서 $p$는 $N$의 가장 작은 소인수이다. 따라서
+    $\alpha$에 대한 bad 값의 비율은 $4\ell^2 / N$보다 작다.
+
+    $\ell$-good 격자 $L(\alpha)$가 주어졌다고 하자. 이 경우, 가우스 축소
+    알고리듬(Gaussian reduction algorithm)을 적용할 수 있으며, 시간 복잡도
+    $\mathcal{O}((\log N)^3)$ 내에 두 개의 0이 아닌 벡터 $U$와 $V$로 구성된
+    $L(\alpha)$의 기저를 얻을 수 있다.  
+    이때 다음 조건을 만족한다:
+    $$
+        \|U\| \leq \|V\| \quad \text{and} \quad |(U, V)| \leq \|U\|^2 / 2.
+    $$
+
+    점 $T = (t, u)$를 다음과 같이 정의하자. 여기서 $(t, u)$는 방정식 $t + \alpha u \equiv c \pmod{N}$의 해이며, 
+    $t$와 $u$는 모두 $2^{k_0}$보다 작다. 이때 $T$는 다음과 같이 표현된다:  
+    $$
+        T = \lambda U + \mu V
+    $$
+    여기서 $\lambda$, $\mu$는 어떤 실수(real)이다. 이때 다음 부등식이 성립한다:
+    $$
+    \|T\|^2 = \lambda^2 \|U\|^2 + \mu^2 \|V\|^2 + 2\lambda \mu (U, V) 
+    \geq (\lambda^2 + \mu^2 - \lambda \mu) \cdot \|U\|^2
+    $$
+    $$
+    \geq \left((\lambda - \mu/2)^2 + \frac{3\mu^2}{4}\right) \cdot \|U\|^2 
+    \geq \frac{3\mu^2}{4} \cdot \|U\|^2 
+    \geq \frac{3\mu^2 \ell^2}{4}.
+    $$
+    게다가 우리는 $\|T\|^2 \leq 2 \cdot 2^{2k_0}$임을 알고 있다. 따라서 다음
+    부등식이 성립한다:
+    \[
+    |\mu| \leq \frac{2\sqrt{2} \cdot 2^{k_0}}{\sqrt{3} \cdot \ell}
+    \quad \text{and} \quad
+    |\lambda| \leq \frac{2\sqrt{2} \cdot 2^{k_0}}{\sqrt{3} \cdot \ell}
+    \quad \text{(대칭성에 의해)}.
+    \]
+    처음부터 $\ell = 2^{k_0 + 2} > 2^{k_0 + 2} \sqrt{\frac{2}{3}}$로 설정했다고
+    가정하면, 다음이 성립한다:
+    \[
+    -\frac{1}{2} < \lambda, \qquad \mu < \frac{1}{2}.
+    \]
+
+    방정식의 임의의 정수 해 $T_0 = (t_0, u_0)$를 선택하자.  
+    이를 위해 $u_0$를 임의의 정수로 선택하고 $t_0 = c - \alpha u_0 \bmod N$으로 정의한다.  
+
+    이제 $T_0$를 기저 $(U, V)$에 대해 실수 좌표 $\rho$, $\sigma$로 표현하면  
+    \[
+    T_0 = \rho U + \sigma V
+    \]
+    이다. 이러한 좌표 $(\rho, \sigma)$는 계산이 가능하며, $T - T_0$는 동차 방정식의 해이므로  
+    이는 격자점에 해당하며 다음과 같이 표현된다:
+    \[
+    T - T_0 = aU + bV,
+    \]
+    여기서 $a$, $b$는 미지의 정수이다.
+
+    하지만 우리는 또한 다음을 만족함을 알고 있다:
+    \[
+    T = T_0 + aU + bV = (\rho + a)U + (\sigma + b)V = \lambda U + \mu V,
+    \]
+    여기서
+    \[
+    -\frac{1}{2} \leq \lambda, \mu \leq \frac{1}{2}.
+    \]
+
+    \paragraph{결론.} 
+    따라서 $a$와 $b$는 각각 $-\rho$와 $-\sigma$에 가장 가까운 정수이다.  
+    $a$, $b$, $\rho$, $\sigma$가 주어지면 $\lambda$, $\mu$를 쉽게 복원할 수 있으며,  
+    그로부터 $t$, $u$를 계산할 수 있다. 이 값들은 반드시 유일하다.
+\end{proof}
