@@ -1,5 +1,7 @@
 \section{OW to PD-OW}
 
+\newcommand{\PDRSA}{\textsf{PD-RSA}}
+
 논문 5절 Application to RSA-OAEP에는 다음과 같은 내용이 있다.
 
 \begin{quote}
@@ -48,8 +50,29 @@ RSA 문제란, 공격자에게 $(N, e)$와 암호문 $c = m^e \bmod N$이 주어
             Return $[m' \issame m]$ & $\xleftarrow{m'}$ & $\cA$ chooses $m' \in \bZ_N$ \\
         \end{tabularx}
     \end{tcolorbox}
-    \caption{RSA 문제 실험}
+    \caption{$\RSA$ 실험}
     \label{fig:rsa-problem}
+\end{figure}
+
+다음은 $\PDRSA$ 실험으로, $\PDOW$ 실험과 유사하다.
+
+\begin{figure}[ht]
+    \begin{tcolorbox}[colback=white]
+        \centering
+        \begin{tabularx}{\linewidth}{CcC}
+            \underline{Challenger $\cC$} & $\xLeftrightarrow{\EXP^{\PDRSA}}$ & \underline{Adversary $\cA$} \\
+            \\
+            $(N, e, d) \gets \textsf{RSA.KeyGen}(1^{\lambda})$ & & \\
+            \\
+            $x \rgets \set{0, 1}^{\lambda - \lambda_0}$ & & \\
+            $r \rgets \set{0, 1}^{\lambda_0}$ & & \\
+            $c \gets (x \cdot 2^{\lambda_0} + r)^e \bmod N$ & $\xrightarrow{N, e, c}$ & \\
+            \\
+            Return $[x' \issame x]$ & $\xleftarrow{x'}$ & $\cA$ chooses $x' \in \set{0, 1}^{\lambda - \lambda_0}$ \\
+        \end{tabularx}
+    \end{tcolorbox}
+    \caption{$\PDRSA$ 실험}
+    \label{fig:pdrsa-problem}
 \end{figure}
 
 RSA 가정(Assumption)은 $n$이 충분히 클 때 RSA 문제를 풀기 어렵다는 것이다. 즉
@@ -183,8 +206,6 @@ $N/10$, 즉 $|C(\cA)| = N/10$이다. 만약 공격자가 암호문의 비율 $\v
 % \end{memo}
 
 \subsection{Proof of OW implies PD-OW}
-
-\newcommand{\PDRSA}{\textsf{PD-RSA}}
 
 지금부터 RSA가 OW이면, RSA는 PD-OW임을 증명한다. 먼저, 다음 보조정리를 증명한다.
 
